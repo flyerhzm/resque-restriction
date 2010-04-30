@@ -12,15 +12,15 @@ Resque Restriction requires Resque 1.7.0.
 To use
 ------
 
-The job you wish to restrict should inherit from Resque::Plugins::RestrictionJob class and add restrict definition. Example:
+It is especially useful when a system has an email invitation resque job, because sending emails too frequentyly will be treated as a spam. What you should do for the InvitationJob is to inherit it from Resque::Plugins::RestrictionJob class and add restrict definition. Example:
 
-	class MyRestrictionJob < Resque::Plugins::RestrictionJob
-	  restrict :per_day => 1000, :per_hour => 1000, :per_300 => 30
+	class InvitationJob < Resque::Plugins::RestrictionJob
+	  restrict :per_day => 1000, :per_hour => 100, :per_300 => 30
 
 	  #rest of your class here
 	end
 
-MyRestrictionJob can be run 1000 times per day, 100 times per hour and 30 times per 300 seconds.
+That means the InvitationJob can not be executed more than 1000 times per day, 100 times per hour and 30 times per 300 seconds.
 
 The argument of restrict method is a hash, the key of the hash is a period time, including :per_minute, :per_hour, :per_day, :per_week, :per_month, :per_year, and you can also define any period like :per_300 means per 300 seconds. the value of the hash is the job execution limit number in a period.
 
