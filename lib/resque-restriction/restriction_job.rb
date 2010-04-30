@@ -5,6 +5,7 @@ module Resque
         :per_minute => 60,
         :per_hour => 60*60,
         :per_day => 24*60*60,
+        :per_week => 7*24*60*60,
         :per_month => 31*24*60*60,
         :per_year => 366*24*60*60
       }
@@ -41,7 +42,7 @@ module Resque
 
         def redis_key(period)
           period_str = case period
-                       when :per_minute, :per_hour, :per_day then (Time.now.to_i / SECONDS[period]).to_s
+                       when :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period]).to_s
                        when :per_month then Date.today.strftime("%Y-%m")
                        when :per_year then Date.today.year.to_s
                        else period.to_s =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
