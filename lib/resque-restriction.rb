@@ -1,2 +1,3 @@
 require 'resque'
-require 'resque/restriction_job'
+require 'resque-restriction/job'
+require 'resque-restriction/restriction_job'

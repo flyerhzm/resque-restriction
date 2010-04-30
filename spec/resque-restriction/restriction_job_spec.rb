@@ -29,28 +29,50 @@ describe Resque::Plugins::RestrictionJob do
 
     before(:each) do
       Resque.redis.flushall
-      @bogus_args = "bogus_args"
     end
     
     it "should set execution number and decrement it when one job first executed" do
-      result = perform_job(OneHourRestrictionJob, @bogus_args)
+      result = perform_job(OneHourRestrictionJob, "any args")
       result.should be_true
       Resque.redis.get("OneHourRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "9"
     end
 
     it "should decrement execution number when one job executed" do
       Resque.redis.set("OneHourRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}", 6)
-      result = perform_job(OneHourRestrictionJob, @bogus_args)
+      result = perform_job(OneHourRestrictionJob, "any args")
       result.should be_true
       Resque.redis.get("OneHourRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "5"
     end
 
     it "should put the job into restriction queue when execution count <= 0" do
       Resque.redis.set("OneHourRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}", 0)
-      result = perform_job(OneHourRestrictionJob, @bogus_args)
+      result = perform_job(OneHourRestrictionJob, "any args")
       result.should_not be_true
       Resque.redis.get("OneHourRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "0"
-      Resque.redis.lrange("queue:restriction", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => [@bogus_args])]
+      Resque.redis.lrange("queue:restriction", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
+    end
+
+    context "multiple restrict" do
+      it "should restrict per_minute" do
+        result = perform_job(MultipleRestrictionJob, "any args")
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "9"
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H-%M")}").should == "1"
+        result = perform_job(MultipleRestrictionJob, "any args")
+        result = perform_job(MultipleRestrictionJob, "any args")
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "8"
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H-%M")}").should == "0"
+      end
+
+      it "should restrict per_hour" do
+        Resque.redis.set("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}", 1)
+        Resque.redis.set("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H-%M")}", 2)
+        result = perform_job(MultipleRestrictionJob, "any args")
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "0"
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H-%M")}").should == "1"
+        result = perform_job(MultipleRestrictionJob, "any args")
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H")}").should == "0"
+        Resque.redis.get("MultipleRestrictionJob:#{Time.now.strftime("%Y-%m-%d-%H-%M")}").should == "1"
+      end
     end
   end
 end
