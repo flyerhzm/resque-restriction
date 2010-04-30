@@ -61,8 +61,9 @@ module Resque
           settings.each do |period, number|
             key = redis_key(period)
             value = get_restrict(key)
+            queue_name = Resque.queue_from_class(self)
             if value.nil? or value == ""
-              Resque.redis.rpoplpush('queue:restriction', "queue:#{queue}")
+              Resque.redis.rpoplpush('queue:restriction', "queue:#{queue_name}")
             end
           end
         end

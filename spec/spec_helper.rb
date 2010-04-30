@@ -51,9 +51,7 @@ end
 class OneDayRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_day => 100
 
-  def self.queue
-    :normal
-  end
+  @queue = 'normal'
   
   def self.perform(args)
   end
@@ -62,9 +60,7 @@ end
 class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
 
-  def self.queue
-    :normal
-  end
+  @queue = 'normal'
 
   def self.perform(args)
   end
@@ -73,9 +69,7 @@ end
 class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10, :per_300 => 2
 
-  def self.queue
-    :normal
-  end
+  @queue = 'normal'
 
   def self.perform(args)
   end
@@ -85,9 +79,7 @@ class MultiCallRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
   restrict :per_300 => 2
 
-  def self.queue
-    :normal
-  end
+  @queue = 'normal'
 
   def self.perform(args)
   end
