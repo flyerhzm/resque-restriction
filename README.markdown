@@ -14,15 +14,15 @@ To use
 
 The job you wish to restrict should inherit from Resque::Plugins::RestrictionJob class and add restrict definition. Example:
 
-  class MyRestrictionJob < Resque::Plugins::RestrictionJob
-    restrict :per_day => 1000, :per_hour => 100, :per_300 => 30
+	class MyRestrictionJob < Resque::Plugins::RestrictionJob
+	  restrict :per_day => 1000, :per_hour => 1000, :per_300 => 30
 
-    # rest of your class here
-  end
+	  #rest of your class here
+	end
 
-The restriction in example means the MyRestrictionJob can be run 1000 times per day, 100 times per hour and 30 times per 300 seconds.
+MyRestrictionJob can be run 1000 times per day, 100 times per hour and 30 times per 300 seconds.
 
-The argument of restrict is a hash, the key of the hash is a period time, including :per_minute, :per_hour, :per_day, :per_week, :per_month, :per_year, and you can also define any period like :per_300 means per 300 seconds. the value of the hash the job execution limit number in a period.
+The argument of restrict method is a hash, the key of the hash is a period time, including :per_minute, :per_hour, :per_day, :per_week, :per_month, :per_year, and you can also define any period like :per_300 means per 300 seconds. the value of the hash is the job execution limit number in a period.
 
 Contributing
 ------------
@@ -45,5 +45,5 @@ Copyright (c) 2010 Richard Huang. See LICENSE for details.
 
 [0]: http://github.com/defunkt/resque
 [1]: http://help.github.com/forking/
-[2]: http://github.com/flyerhm/resque-restriction/issues
+[2]: http://github.com/flyerhzm/resque-restriction/issues
 
