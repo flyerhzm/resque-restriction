@@ -24,7 +24,7 @@ begin
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "resque-restriction"
     gemspec.summary = "resque-restriction is an extension to resque queue system that restricts the execution number of certain jobs in a period time."
-    gemspec.description = "resque-restriction is an extension to resque queue system that restricts the execution number of certain jobs in a period time."
+    gemspec.description = "resque-restriction is an extension to resque queue system that restricts the execution number of certain jobs in a period time, the exceeded jobs will be executed at the next period."
     gemspec.email = "flyerhzm@gmail.com"
     gemspec.homepage = "http://github.com/flyerhzm/resque-restriction"
     gemspec.authors = ["Richard Huang"]

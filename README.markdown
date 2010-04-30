@@ -5,7 +5,7 @@ Resque Restriction is a plugin for the [Resque][0] queueing system (http://githu
 
 1. it will limit the execution number of certain jobs in a period time. For example, it can limit a certain job can be executed 1000 times per day, 100 time per hour and 30 times per 300 seconds.
 
-2. it will execute the excess jobs at the next period. For example, you restrict the email sending jobs to run 1000 times per day. If your system generates 1010 email sending jobs, only 1000 email sending jobs can be executed today, and the other 10 email sending jobs will be executed tomorrow.
+2. it will execute the exceeded jobs at the next period. For example, you restrict the email sending jobs to run 1000 times per day. If your system generates 1010 email sending jobs, only 1000 email sending jobs can be executed today, and the other 10 email sending jobs will be executed tomorrow.
 
 Resque Restriction requires Resque 1.7.0.
 
