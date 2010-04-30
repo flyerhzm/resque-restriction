@@ -24,7 +24,7 @@ module Resque
             value = get_restrict(key)
 
             if value.nil? or value == ""
-              set_restrict(key, SECONDS[period], number)
+              set_restrict(key, seconds(period), number)
             elsif value.to_i <= 0
               Resque.push "restriction", :class => to_s, :args => args
               raise Resque::Job::DontPerform
@@ -41,13 +41,19 @@ module Resque
 
         def redis_key(period)
           period_str = case period
-                       when :per_minute then Time.now.strftime("%Y-%m-%d-%H-%M")
-                       when :per_hour then Time.now.strftime("%Y-%m-%d-%H")
-                       when :per_day then Date.today.to_s
+                       when :per_minute, :per_hour, :per_day then (Time.now.to_i / SECONDS[period]).to_s
                        when :per_month then Date.today.strftime("%Y-%m")
                        when :per_year then Date.today.year.to_s
-                       end
+                       else period.to_s =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
           [self.to_s, period_str].compact.join(":")
+        end
+
+        def seconds(period)
+          if SECONDS.keys.include? period
+            SECONDS[period]
+          else
+            period.to_s =~ /^per_(\d+)$/ and $1
+          end
         end
 
         def repush

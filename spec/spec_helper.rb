@@ -71,7 +71,7 @@ class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
 end
 
 class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
-  restrict :per_hour => 10, :per_minute => 2
+  restrict :per_hour => 10, :per_300 => 2
 
   def self.queue
     :normal
@@ -83,7 +83,7 @@ end
 
 class MultiCallRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
-  restrict :per_minute => 2
+  restrict :per_300 => 2
 
   def self.queue
     :normal
