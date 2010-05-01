@@ -9,6 +9,11 @@ Resque Restriction is a plugin for the [Resque][0] queueing system (http://githu
 
 Resque Restriction requires Resque 1.7.0.
 
+Install
+-------
+
+  sudo gem install resque-restriction
+
 To use
 ------
 
