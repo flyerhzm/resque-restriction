@@ -72,7 +72,6 @@ module Resque
         # use operation set - expire - incrby instead
         def set_restrict(key, seconds, number)
           Resque.redis.set(key, '')
-          Resque.redis.expire(key, seconds)
           Resque.redis.incrby(key, number)
         end
 
