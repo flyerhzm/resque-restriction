@@ -36,7 +36,7 @@ module Resque
             if value < 0
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
-              keys_decremented.each {|k| p "reinc"; p k; p Resque.redis.incrby(k, 1)}
+              keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
               Resque.push "restriction", :class => to_s, :args => args
               raise Resque::Job::DontPerform
             else
