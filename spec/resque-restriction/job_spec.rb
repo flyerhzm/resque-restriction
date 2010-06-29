@@ -11,7 +11,7 @@ describe Resque::Job do
 
   it "should push back to restriction queue when still restricted" do
     Resque.redis.flushall
-    Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 0)
+    Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
     Resque.push('restriction', :class => 'OneHourRestrictionJob', :args => ['any args'])
     Resque::Job.reserve('restriction').should be_nil
     Resque.pop('restriction').should == {'class' => 'OneHourRestrictionJob', 'args' => ['any args']}

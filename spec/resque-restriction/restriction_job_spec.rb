@@ -60,11 +60,11 @@ describe Resque::Plugins::RestrictionJob do
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "5"
     end
 
-    it "should put the job into restriction queue when execution count <= 0" do
+    it "should put the job into restriction queue when execution count < 0" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 0)
       result = perform_job(OneHourRestrictionJob, "any args")
       result.should_not be_true
-      Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "0"
+      Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "-1"
       Resque.redis.lrange("queue:restriction", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
     end
 
@@ -76,7 +76,7 @@ describe Resque::Plugins::RestrictionJob do
         result = perform_job(MultipleRestrictionJob, "any args")
         result = perform_job(MultipleRestrictionJob, "any args")
         Resque.redis.get(MultipleRestrictionJob.redis_key(:per_hour)).should == "8"
-        Resque.redis.get(MultipleRestrictionJob.redis_key(:per_300)).should == "0"
+        Resque.redis.get(MultipleRestrictionJob.redis_key(:per_300)).should == "-1"
       end
 
       it "should restrict per_hour" do
@@ -86,7 +86,7 @@ describe Resque::Plugins::RestrictionJob do
         Resque.redis.get(MultipleRestrictionJob.redis_key(:per_hour)).should == "0"
         Resque.redis.get(MultipleRestrictionJob.redis_key(:per_300)).should == "1"
         result = perform_job(MultipleRestrictionJob, "any args")
-        Resque.redis.get(MultipleRestrictionJob.redis_key(:per_hour)).should == "0"
+        Resque.redis.get(MultipleRestrictionJob.redis_key(:per_hour)).should == "-1"
         Resque.redis.get(MultipleRestrictionJob.redis_key(:per_300)).should == "1"
       end
     end

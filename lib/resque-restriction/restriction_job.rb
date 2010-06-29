@@ -19,24 +19,32 @@ module Resque
       end
 
       def before_perform_restriction(*args)
+        keys_decremented = []
         settings.each do |period, number|
           key = redis_key(period, *args)
-          value = get_restrict(key)
 
-          if value.nil? or value == ""
-            set_restrict(key, seconds(period), number)
-          elsif value.to_i <= 0
-            Resque.push "restriction", :class => to_s, :args => args
-            raise Resque::Job::DontPerform
+          # first try to set period key to be the total allowed for the period
+          # if we get a 0 result back, the key wasn't set, so we know we are
+          # already tracking the count for that period'
+          period_active = ! Resque.redis.setnx(key, number.to_i - 1)
+
+          # If we are already tracking that period, then decrement by one to
+          # see if we are allowed to run, pushing to restriction queue to run
+          # later if not
+          if period_active
+            value = Resque.redis.decrby(key, 1).to_i
+            if value < 0
+              # reincrement the keys if one of the periods triggers DontPerform so
+              # that we accurately track capacity
+              keys_decremented.each {|k| p "reinc"; p k; p Resque.redis.incrby(k, 1)}
+              Resque.push "restriction", :class => to_s, :args => args
+              raise Resque::Job::DontPerform
+            else
+              keys_decremented << key
+            end
           end
         end
-      end
 
-      def after_perform_restriction(*args)
-        settings.each do |period, number|
-          key = redis_key(period, *args)
-          Resque.redis.decrby(key, 1)
-        end
       end
 
       def redis_key(period, *args)
@@ -65,8 +73,8 @@ module Resque
         queue_name = Resque.queue_from_class(self)
         settings.each do |period, number|
           key = redis_key(period, *args)
-          value = get_restrict(key)
-          no_restrictions &&= (value.nil? or value == "" or value.to_i > 0)
+          value = Resque.redis.get(key)
+          no_restrictions &&= (value.nil? or value == "" or value.to_i >= 0)
         end
         if no_restrictions
           Resque.push queue_name, :class => to_s, :args => args
@@ -75,17 +83,6 @@ module Resque
         end
       end
 
-      private
-        # after operation incrby - expire, then decrby will reset the value to 0 first
-        # use operation set - expire - incrby instead
-        def set_restrict(key, seconds, number)
-          Resque.redis.set(key, '')
-          Resque.redis.incrby(key, number)
-        end
-
-        def get_restrict(key)
-          Resque.redis.get(key)
-        end
     end
 
     class RestrictionJob
