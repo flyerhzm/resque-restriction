@@ -30,17 +30,18 @@ module Resque
 
           # If we are already tracking that period, then decrement by one to
           # see if we are allowed to run, pushing to restriction queue to run
-          # later if not
+          # later if not.  Note that the value stored is the number of outstanding
+          # jobs allowed, thus we need to reincrement if the decr discovers that
+          # we have bypassed the limit
           if period_active
             value = Resque.redis.decrby(key, 1).to_i
+            keys_decremented << key
             if value < 0
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
               keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
               Resque.push "restriction", :class => to_s, :args => args
               raise Resque::Job::DontPerform
-            else
-              keys_decremented << key
             end
           end
         end

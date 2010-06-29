@@ -85,7 +85,7 @@ class ConcurrentRestrictionJob < Resque::Plugins::RestrictionJob
   @queue = 'normal'
 
   def self.perform(*args)
-    sleep 1
+    sleep 0.2
   end
 end
 
