@@ -82,7 +82,7 @@ module Resque
         settings.each do |period, number|
           key = redis_key(period, *args)
           value = Resque.redis.get(key)
-          no_restrictions &&= (value.nil? or value == "" or value.to_i >= 0)
+          no_restrictions &&= (value.nil? or value == "" or value.to_i > 0)
         end
         if no_restrictions
           Resque.push queue_name, :class => to_s, :args => args
