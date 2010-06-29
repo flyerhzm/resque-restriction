@@ -28,7 +28,7 @@ at_exit do
   exit_code = Spec::Runner.run
 
   pid = `ps -e -o pid,command | grep [r]edis-test`.split(" ")[0]
-  puts "Killing test redis server..."
+  puts "Killing test redis server [#{pid}]..."
   `rm -f #{dir}/dump.rdb`
   Process.kill("KILL", pid.to_i)
   exit exit_code
@@ -63,6 +63,19 @@ class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
   @queue = 'normal'
 
   def self.perform(args)
+  end
+end
+
+class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
+  restrict :per_hour => 10
+
+  @queue = 'normal'
+
+  def self.identifier(*args)
+    [self.to_s, args.first].join(":")
+  end
+
+  def self.perform(*args)
   end
 end
 

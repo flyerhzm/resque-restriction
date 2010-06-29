@@ -42,6 +42,17 @@ describe Resque::Plugins::RestrictionJob do
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "9"
     end
 
+    it "should use identifier to set exclusive execution counts" do
+      result = perform_job(IdentifiedRestrictionJob, 1)
+      result.should be_true
+      result = perform_job(IdentifiedRestrictionJob, 1)
+      result.should be_true
+      result = perform_job(IdentifiedRestrictionJob, 2)
+      result.should be_true
+      Resque.redis.get(IdentifiedRestrictionJob.redis_key(:per_hour, 1)).should == "8"
+      Resque.redis.get(IdentifiedRestrictionJob.redis_key(:per_hour, 2)).should == "9"
+    end
+
     it "should decrement execution number when one job executed" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 6)
       result = perform_job(OneHourRestrictionJob, "any args")

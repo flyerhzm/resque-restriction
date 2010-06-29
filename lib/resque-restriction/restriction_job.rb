@@ -20,7 +20,7 @@ module Resque
 
       def before_perform_restriction(*args)
         settings.each do |period, number|
-          key = redis_key(period)
+          key = redis_key(period, *args)
           value = get_restrict(key)
 
           if value.nil? or value == ""
@@ -34,18 +34,22 @@ module Resque
 
       def after_perform_restriction(*args)
         settings.each do |period, number|
-          key = redis_key(period)
+          key = redis_key(period, *args)
           Resque.redis.decrby(key, 1)
         end
       end
 
-      def redis_key(period)
+      def redis_key(period, *args)
         period_str = case period
                      when :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period]).to_s
                      when :per_month then Date.today.strftime("%Y-%m")
                      when :per_year then Date.today.year.to_s
                      else period.to_s =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
-        [self.to_s, period_str].compact.join(":")
+        [self.identifier(*args), period_str].compact.join(":")
+      end
+
+      def identifier(*args)
+        self.to_s
       end
 
       def seconds(period)
@@ -56,14 +60,18 @@ module Resque
         end
       end
 
-      def repush
+      def repush(*args)
+        no_restrictions = true
+        queue_name = Resque.queue_from_class(self)
         settings.each do |period, number|
-          key = redis_key(period)
+          key = redis_key(period, *args)
           value = get_restrict(key)
-          queue_name = Resque.queue_from_class(self)
-          if value.nil? or value == ""
-            Resque.redis.rpoplpush('queue:restriction', "queue:#{queue_name}")
-          end
+          no_restrictions &&= (value.nil? or value == "" or value.to_i > 0)
+        end
+        if no_restrictions
+          Resque.push queue_name, :class => to_s, :args => args
+        else
+          Resque.push "restriction", :class => to_s, :args => args
         end
       end
 

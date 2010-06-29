@@ -4,8 +4,8 @@ module Resque
       alias_method :origin_reserve, :reserve
       
       def reserve(queue)
-        if queue == 'restriction' && payload = Resque.peek(queue)
-          constantize(payload['class']).repush
+        if queue == 'restriction' && payload = Resque.pop(queue)
+          constantize(payload['class']).repush(*payload['args'])
           return
         end
         origin_reserve(queue)
