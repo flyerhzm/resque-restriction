@@ -29,6 +29,23 @@ That means the InvitationJob can not be executed more than 1000 times per day, 1
 
 The argument of restrict method is a hash, the key of the hash is a period time, including :per_minute, :per_hour, :per_day, :per_week, :per_month, :per_year, and you can also define any period like :per_300 means per 300 seconds. the value of the hash is the job execution limit number in a period.
 
+Advance
+-------
+
+You can also add customized restriction as you like. For example, we have a job to restrict the facebook post numbers 40 times per user per day, we can define as:
+
+	class GenerateFacebookShares < Resque::Plugins::RestrictionJob
+    restrict :per_day => 40
+    
+    def self.identifier(options)
+      [self.to_s, options["user_id"]].join(":")
+    end
+    
+    #rest of your class here
+	end
+
+options["user_id"] returns the user's facebook uid, the key point is that the different identifiers can restrict different job execution numbers.
+
 Contributing
 ------------
 
@@ -43,6 +60,10 @@ Once you've made your commits:
 Author
 ------
 Richard Huang :: flyerhzm@gmail.com :: @flyerhzm
+
+Contributors
+------------
+Matt Conway :: matt@conwaysplace.com :: @mattconway
 
 Copyright
 ---------
