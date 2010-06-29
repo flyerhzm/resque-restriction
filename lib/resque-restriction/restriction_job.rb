@@ -44,11 +44,18 @@ module Resque
             end
           end
         end
+      end
 
+      def after_perform_restriction(*args)
+        if settings[:concurrent]
+          key = redis_key(:concurrent, *args)
+          Resque.redis.incrby(key, 1)
+        end
       end
 
       def redis_key(period, *args)
         period_str = case period
+                     when :concurrent then "*"
                      when :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period]).to_s
                      when :per_month then Date.today.strftime("%Y-%m")
                      when :per_year then Date.today.year.to_s

@@ -79,6 +79,16 @@ class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
   end
 end
 
+class ConcurrentRestrictionJob < Resque::Plugins::RestrictionJob
+  restrict :concurrent => 1
+
+  @queue = 'normal'
+
+  def self.perform(*args)
+    sleep 1
+  end
+end
+
 class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10, :per_300 => 2
 
