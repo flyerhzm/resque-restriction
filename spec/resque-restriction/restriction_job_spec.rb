@@ -71,6 +71,12 @@ describe Resque::Plugins::RestrictionJob do
       Resque.redis.get(ConcurrentRestrictionJob.redis_key(:concurrent)).should == "1"
     end
 
+    it "should increment execution number when concurrent job fails" do
+      ConcurrentRestrictionJob.should_receive(:perform).and_raise("bad")
+      perform_job(ConcurrentRestrictionJob, "any args") rescue nil
+      Resque.redis.get(ConcurrentRestrictionJob.redis_key(:concurrent)).should == "1"
+    end
+
     it "should put the job into restriction queue when execution count < 0" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 0)
       result = perform_job(OneHourRestrictionJob, "any args")
