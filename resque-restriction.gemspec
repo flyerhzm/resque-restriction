@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{resque-restriction}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Richard Huang"]
-  s.date = %q{2010-06-29}
+  s.date = %q{2010-07-10}
   s.description = %q{resque-restriction is an extension to resque queue system that restricts the execution number of certain jobs in a period time, the exceeded jobs will be executed at the next period.}
   s.email = %q{flyerhzm@gmail.com}
   s.extra_rdoc_files = [
