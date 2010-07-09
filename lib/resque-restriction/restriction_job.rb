@@ -54,6 +54,10 @@ module Resque
         end
       end
 
+      def on_failure_restriction(ex, *args)
+        after_perform_restriction(*args)
+      end
+
       def redis_key(period, *args)
         period_str = case period
                      when :concurrent then "*"
