@@ -82,7 +82,7 @@ describe Resque::Plugins::RestrictionJob do
       result = perform_job(OneHourRestrictionJob, "any args")
       result.should_not be_true
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "0"
-      Resque.redis.lrange("queue:restriction", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
+      Resque.redis.lrange("queue:restriction_normal", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
     end
 
     context "multiple restrict" do
