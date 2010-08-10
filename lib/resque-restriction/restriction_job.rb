@@ -9,7 +9,7 @@ module Resque
         :per_month => 31*24*60*60,
         :per_year => 366*24*60*60
       }
-      RESTRICTION_QUEUE_PREFIX = 'restriction_'
+      RESTRICTION_QUEUE_PREFIX = 'restriction'
 
       def settings
         @options ||= {}
@@ -75,7 +75,7 @@ module Resque
 
       def restriction_queue_name
         queue_name = Resque.queue_from_class(self)
-        "restriction_#{queue_name}"
+        "#{RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
       end
 
       def seconds(period)
