@@ -96,6 +96,7 @@ module Resque
           key = redis_key(period, *args)
           value = Resque.redis.get(key)
           no_restrictions &&= (value.nil? or value == "" or value.to_i > 0)
+          break unless no_restrictions
         end
         if no_restrictions
           Resque.push Resque.queue_from_class(self), :class => to_s, :args => args
