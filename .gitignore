@@ -1,2 +1,4 @@
 spec/dump.rdb
 pkg/**
+.idea
+
