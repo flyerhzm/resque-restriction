@@ -107,5 +107,20 @@ describe Resque::Plugins::RestrictionJob do
         Resque.redis.get(MultipleRestrictionJob.redis_key(:per_300)).should == "1"
       end
     end
+
+    context "repush" do
+      it "should push restricted jobs onto restriction queue" do
+        Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
+        Resque.should_receive(:push).once.with('restriction_normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
+        OneHourRestrictionJob.repush('any args').should be_true
+      end
+
+      it "should not push unrestricted jobs onto restriction queue" do
+        Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 1)
+        Resque.should_not_receive(:push)
+        OneHourRestrictionJob.repush('any args').should be_false
+      end
+
+    end
   end
 end

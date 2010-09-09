@@ -91,17 +91,18 @@ module Resque
       # real queue, job will just get pushed back onto restriction queue then if
       # restriction conditions have changed
       def repush(*args)
-        no_restrictions = true
+        has_restrictions = false
         settings.each do |period, number|
           key = redis_key(period, *args)
           value = Resque.redis.get(key)
-          no_restrictions &&= (value.nil? or value == "" or value.to_i > 0)
-          break unless no_restrictions
+          has_restrictions = value && value != "" && value.to_i <= 0
+          break if has_restrictions
         end
-        if no_restrictions
-          Resque.push Resque.queue_from_class(self), :class => to_s, :args => args
-        else
+        if has_restrictions
           Resque.push restriction_queue_name, :class => to_s, :args => args
+          return true
+        else
+          return false
         end
       end
 
