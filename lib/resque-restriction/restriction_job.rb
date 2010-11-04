@@ -66,10 +66,10 @@ module Resque
                      when :per_month then Date.today.strftime("%Y-%m")
                      when :per_year then Date.today.year.to_s
                      else period.to_s =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
-        [self.identifier(*args), period_str].compact.join(":")
+        [self.restriction_identifier(*args), period_str].compact.join(":")
       end
 
-      def identifier(*args)
+      def restriction_identifier(*args)
         self.to_s
       end
 

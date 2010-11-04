@@ -71,7 +71,7 @@ class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
 
   @queue = 'normal'
 
-  def self.identifier(*args)
+  def self.restriction_identifier(*args)
     [self.to_s, args.first].join(":")
   end
 

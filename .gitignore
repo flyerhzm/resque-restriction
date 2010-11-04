@@ -1,4 +1,5 @@
 spec/dump.rdb
 pkg/**
 .idea
+.rvmrc
 

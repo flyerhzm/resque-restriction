@@ -9,6 +9,11 @@ Resque Restriction is a plugin for the [Resque][0] queueing system (http://githu
 
 Resque Restriction requires Resque 1.7.0.
 
+Attention
+---------
+
+The <code>identifier</code> method is renamed to <code>restriction_identifier</code> to solve the confliction with resque-retry from version 0.3.0.
+
 Install
 -------
 
@@ -37,14 +42,14 @@ You can also add customized restriction as you like. For example, we have a job 
 	class GenerateFacebookShares < Resque::Plugins::RestrictionJob
 	  restrict :per_day => 40
     
-	  def self.identifier(options)
+	  def self.restriction_identifier(options)
 	    [self.to_s, options["user_id"]].join(":")
 	  end
     
 	  #rest of your class here
 	end
 
-options["user_id"] returns the user's facebook uid, the key point is that the different identifiers can restrict different job execution numbers.
+options["user_id"] returns the user's facebook uid, the key point is that the different restriction_identifiers can restrict different job execution numbers.
 
 Contributing
 ------------
