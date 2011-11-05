@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 describe Resque::Plugins::RestrictionJob do
   it "should follow the convention" do
@@ -83,6 +83,95 @@ describe Resque::Plugins::RestrictionJob do
       result.should_not be_true
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "0"
       Resque.redis.lrange("queue:restriction_normal", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
+    end
+
+    describe "expiration of period keys" do
+      class MyJob
+        extend Resque::Plugins::Restriction
+
+        def self.perform(*args)
+        end
+      end
+
+      shared_examples_for "expiration" do
+        before(:each) do
+          MyJob.restrict period => 10
+        end
+
+        context "when the key is not set" do
+          it "should mark period keys to expire" do
+            perform_job(MyJob, "any args")
+            Resque.redis.ttl(MyJob.redis_key(period)).should == MyJob.seconds(period)
+          end
+        end
+
+        context "when the key is set" do
+          before(:each) do
+            Resque.redis.set(MyJob.redis_key(period), 5)
+          end
+
+          it "should not mark period keys to expire" do
+            perform_job(MyJob, "any args")
+            Resque.redis.ttl(MyJob.redis_key(period)).should == -1
+          end
+        end
+      end
+
+      describe "per minute" do
+        def period
+          :per_minute
+        end
+
+        it_should_behave_like "expiration"
+      end
+
+      describe "per hour" do
+        def period
+          :per_hour
+        end
+
+        it_should_behave_like "expiration"
+      end
+
+      describe "per day" do
+        def period
+          :per_day
+        end
+
+        it_should_behave_like "expiration"
+      end
+
+      describe "per week" do
+        def period
+          :per_week
+        end
+
+        it_should_behave_like "expiration"
+      end
+
+      describe "per month" do
+        def period
+          :per_month
+        end
+
+        it_should_behave_like "expiration"
+      end
+
+      describe "per year" do
+        def period
+          :per_year
+        end
+
+        it_should_behave_like "expiration"
+      end
+
+      describe "per custom period" do
+        def period
+          :per_359
+        end
+
+        it_should_behave_like "expiration"
+      end
     end
 
     context "multiple restrict" do
