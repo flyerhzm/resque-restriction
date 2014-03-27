@@ -44,6 +44,9 @@ module Resque
               Resque.push restriction_queue_name, :class => to_s, :args => args
               raise Resque::Job::DontPerform
             end
+          else
+            # This is the first time we set the key, so we mark it to expire
+            mark_restriction_key_to_expire_for(key, period)
           end
         end
       end
@@ -82,7 +85,7 @@ module Resque
         if SECONDS.keys.include? period
           SECONDS[period]
         else
-          period.to_s =~ /^per_(\d+)$/ and $1
+          period.to_s =~ /^per_(\d+)$/ and $1.to_i
         end
       end
 
@@ -106,6 +109,9 @@ module Resque
         end
       end
 
+      def mark_restriction_key_to_expire_for(key, period)
+        Resque.redis.expire(key, seconds(period)) unless period == :concurrent
+      end
     end
 
     class RestrictionJob
