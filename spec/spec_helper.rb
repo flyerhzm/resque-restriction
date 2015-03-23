@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'spec/autorun'
 require 'mocha'
 
 dir = File.dirname(__FILE__)
