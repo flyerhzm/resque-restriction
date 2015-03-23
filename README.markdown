@@ -41,11 +41,11 @@ You can also add customized restriction as you like. For example, we have a job 
 
 	class GenerateFacebookShares < Resque::Plugins::RestrictionJob
 	  restrict :per_day => 40
-    
+
 	  def self.restriction_identifier(options)
 	    [self.to_s, options["user_id"]].join(":")
 	  end
-    
+
 	  #rest of your class here
 	end
 

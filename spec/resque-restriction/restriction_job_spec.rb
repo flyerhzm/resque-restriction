@@ -19,7 +19,7 @@ describe Resque::Plugins::RestrictionJob do
       Resque::Plugins::RestrictionJob.redis_key(:per_7200).should == "Resque::Plugins::RestrictionJob:#{Time.now.to_i / 7200}"
     end
   end
-  
+
   context "settings" do
     it "get correct number to restriction jobs" do
       OneDayRestrictionJob.settings.should == {:per_day => 100}
