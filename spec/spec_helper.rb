@@ -42,67 +42,66 @@ Resque.redis = 'localhost:9736'
 #
 module PerformJob
   def perform_job(klass, *args)
-    resque_job = Resque::Job.new(:testqueue, 'class' => klass, 'args' => args)
-    resque_job.perform
+    klass.perform_now(args)
   end
 end
 
-class OneDayRestrictionJob < Resque::Plugins::RestrictionJob
+class OneDayRestrictionJob < Resque::Plugins::RestrictionActiveJob
   restrict :per_day => 100
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end
 
-class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
+class OneHourRestrictionJob < Resque::Plugins::RestrictionActiveJob
   restrict :per_hour => 10
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end
 
-class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
+class IdentifiedRestrictionJob < Resque::Plugins::RestrictionActiveJob
   restrict :per_hour => 10
 
-  @queue = 'normal'
+  queue_as 'normal'
 
   def self.restriction_identifier(*args)
     [self.to_s, args.first].join(":")
   end
 
-  def self.perform(*args)
+  def perform(*args)
   end
 end
 
-class ConcurrentRestrictionJob < Resque::Plugins::RestrictionJob
+class ConcurrentRestrictionJob < Resque::Plugins::RestrictionActiveJob
   restrict :concurrent => 1
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(*args)
+  def perform(*args)
     sleep 0.2
   end
 end
 
-class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
+class MultipleRestrictionJob < Resque::Plugins::RestrictionActiveJob
   restrict :per_hour => 10, :per_300 => 2
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end
 
-class MultiCallRestrictionJob < Resque::Plugins::RestrictionJob
+class MultiCallRestrictionJob < Resque::Plugins::RestrictionActiveJob
   restrict :per_hour => 10
   restrict :per_300 => 2
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end

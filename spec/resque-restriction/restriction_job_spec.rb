@@ -29,6 +29,19 @@ describe Resque::Plugins::RestrictionJob do
     end
   end
 
+  context 'restriction_queue_name' do
+    class MyJob < Resque::Plugins::RestrictionActiveJob
+      queue_as 'awesome_queue_name'
+
+      def perform(*args)
+      end
+    end
+
+    it 'concats restriction queue prefix with queue name' do
+      expect(MyJob.restriction_queue_name).to eq("#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_awesome_queue_name")
+    end
+  end
+
   context "resque" do
     include PerformJob
 
@@ -38,17 +51,14 @@ describe Resque::Plugins::RestrictionJob do
 
     it "should set execution number and decrement it when one job first executed" do
       result = perform_job(OneHourRestrictionJob, "any args")
-      expect(result).to be(true)
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "9"
     end
 
     it "should use restriction_identifier to set exclusive execution counts" do
       result = perform_job(IdentifiedRestrictionJob, 1)
-      expect(result).to be(true)
       result = perform_job(IdentifiedRestrictionJob, 1)
-      expect(result).to be(true)
       result = perform_job(IdentifiedRestrictionJob, 2)
-      expect(result).to be(true)
+
       Resque.redis.get(IdentifiedRestrictionJob.redis_key(:per_hour, 1)).should == "8"
       Resque.redis.get(IdentifiedRestrictionJob.redis_key(:per_hour, 2)).should == "9"
     end
@@ -56,14 +66,14 @@ describe Resque::Plugins::RestrictionJob do
     it "should decrement execution number when one job executed" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 6)
       result = perform_job(OneHourRestrictionJob, "any args")
-      expect(result).to be(true)
+
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "5"
     end
 
     it "should increment execution number when concurrent job completes" do
       t = Thread.new do
-        result = perform_job(ConcurrentRestrictionJob, "any args")
-        expect(result).to be(true)
+        perform_job(ConcurrentRestrictionJob, "any args")
+
       end
       sleep 0.1
       Resque.redis.get(ConcurrentRestrictionJob.redis_key(:concurrent)).should == "0"
@@ -72,7 +82,7 @@ describe Resque::Plugins::RestrictionJob do
     end
 
     it "should increment execution number when concurrent job fails" do
-      ConcurrentRestrictionJob.should_receive(:perform).and_raise("bad")
+      ConcurrentRestrictionJob.any_instance.should_receive(:perform).and_raise("bad")
       perform_job(ConcurrentRestrictionJob, "any args") rescue nil
       Resque.redis.get(ConcurrentRestrictionJob.redis_key(:concurrent)).should == "1"
     end
@@ -80,16 +90,14 @@ describe Resque::Plugins::RestrictionJob do
     it "should put the job into restriction queue when execution count < 0" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 0)
       result = perform_job(OneHourRestrictionJob, "any args")
-      expect(result).to_not be(true)
+      # expect(result).to_not be(true)
       Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour)).should == "0"
       Resque.redis.lrange("queue:restriction_normal", 0, -1).should == [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
     end
 
     describe "expiration of period keys" do
-      class MyJob
-        extend Resque::Plugins::Restriction
-
-        def self.perform(*args)
+      class MyJob < Resque::Plugins::RestrictionActiveJob
+        def perform(*args)
         end
       end
 

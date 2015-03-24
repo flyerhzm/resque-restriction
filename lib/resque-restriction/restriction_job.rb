@@ -1,5 +1,8 @@
+require 'active_job'
+
 module Resque
   module Plugins
+
     module Restriction
       SECONDS = {
         :per_minute => 60,
@@ -76,10 +79,6 @@ module Resque
         self.to_s
       end
 
-      def restriction_queue_name
-        queue_name = Resque.queue_from_class(self)
-        "#{RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
-      end
 
       def seconds(period)
         if SECONDS.keys.include? period
@@ -114,8 +113,34 @@ module Resque
       end
     end
 
+    class RestrictionActiveJob < ActiveJob::Base
+      extend Restriction
+
+      before_perform do |job|
+        self.class.before_perform_restriction(job.arguments)
+      end
+
+      after_perform do |job|
+        self.class.after_perform_restriction(job.arguments)
+      end
+
+      rescue_from(StandardError) do |err|
+        self.class.on_failure_restriction(self.arguments)
+      end
+
+      def self.restriction_queue_name
+        queue_name = self.new.queue_name
+        "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
+      end
+    end
+
     class RestrictionJob
       extend Restriction
+
+      def self.restriction_queue_name
+        queue_name = Resque.queue_from_class(self)
+        "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
+      end
     end
 
   end
