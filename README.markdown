@@ -51,6 +51,17 @@ You can also add customized restriction as you like. For example, we have a job 
 
 options["user_id"] returns the user's facebook uid, the key point is that the different restriction_identifiers can restrict different job execution numbers.
 
+Active Job
+----------
+
+You can also use it with ActiveJob, to do so:
+
+	class GenerateFacebookShares < Resque::Plugins::RestrictionActiveJob
+	  restrict :per_day => 40
+
+	  #rest of your class here
+	end
+
 Contributing
 ------------
 
@@ -69,6 +80,7 @@ Richard Huang :: flyerhzm@gmail.com :: @flyerhzm
 Contributors
 ------------
 Matt Conway :: matt@conwaysplace.com :: @mattconway
+Martin Fourcade :: fourcade.m@gmail.com :: @mfourcade
 
 Copyright
 ---------

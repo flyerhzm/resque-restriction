@@ -31,7 +31,6 @@ module Resque
           # if we get a 0 result back, the key wasn't set, so we know we are
           # already tracking the count for that period'
           period_active = ! Resque.redis.setnx(key, number.to_i - 1)
-
           # If we are already tracking that period, then decrement by one to
           # see if we are allowed to run, pushing to restriction queue to run
           # later if not.  Note that the value stored is the number of outstanding
@@ -117,15 +116,15 @@ module Resque
       extend Restriction
 
       before_perform do |job|
-        self.class.before_perform_restriction(job.arguments)
+        self.class.before_perform_restriction(*job.arguments)
       end
 
       after_perform do |job|
-        self.class.after_perform_restriction(job.arguments)
+        self.class.after_perform_restriction(*job.arguments)
       end
 
       rescue_from(StandardError) do |err|
-        self.class.on_failure_restriction(self.arguments)
+        self.class.on_failure_restriction(err, *self.arguments)
       end
 
       def self.restriction_queue_name

@@ -33,7 +33,7 @@ describe Resque::Plugins::RestrictionJob do
     class MyJob < Resque::Plugins::RestrictionActiveJob
       queue_as 'awesome_queue_name'
 
-      def perform(*args)
+      def perform(args)
       end
     end
 
@@ -73,7 +73,6 @@ describe Resque::Plugins::RestrictionJob do
     it "should increment execution number when concurrent job completes" do
       t = Thread.new do
         perform_job(ConcurrentRestrictionJob, "any args")
-
       end
       sleep 0.1
       Resque.redis.get(ConcurrentRestrictionJob.redis_key(:concurrent)).should == "0"
@@ -97,7 +96,7 @@ describe Resque::Plugins::RestrictionJob do
 
     describe "expiration of period keys" do
       class MyJob < Resque::Plugins::RestrictionActiveJob
-        def perform(*args)
+        def perform(args)
         end
       end
 

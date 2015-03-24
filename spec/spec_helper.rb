@@ -42,7 +42,7 @@ Resque.redis = 'localhost:9736'
 #
 module PerformJob
   def perform_job(klass, *args)
-    klass.perform_now(args)
+    klass.perform_now(*args)
   end
 end
 
@@ -73,7 +73,7 @@ class IdentifiedRestrictionJob < Resque::Plugins::RestrictionActiveJob
     [self.to_s, args.first].join(":")
   end
 
-  def perform(*args)
+  def perform(args)
   end
 end
 
@@ -82,7 +82,7 @@ class ConcurrentRestrictionJob < Resque::Plugins::RestrictionActiveJob
 
   queue_as 'normal'
 
-  def perform(*args)
+  def perform(args)
     sleep 0.2
   end
 end
