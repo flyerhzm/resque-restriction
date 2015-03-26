@@ -46,7 +46,7 @@ module PerformJob
   end
 end
 
-class OneDayRestrictionJob < Resque::Plugins::RestrictionActiveJob
+class OneDayRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_day => 100
 
   queue_as 'normal'
@@ -55,7 +55,7 @@ class OneDayRestrictionJob < Resque::Plugins::RestrictionActiveJob
   end
 end
 
-class OneHourRestrictionJob < Resque::Plugins::RestrictionActiveJob
+class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
 
   queue_as 'normal'
@@ -64,7 +64,7 @@ class OneHourRestrictionJob < Resque::Plugins::RestrictionActiveJob
   end
 end
 
-class IdentifiedRestrictionJob < Resque::Plugins::RestrictionActiveJob
+class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
 
   queue_as 'normal'
@@ -77,7 +77,7 @@ class IdentifiedRestrictionJob < Resque::Plugins::RestrictionActiveJob
   end
 end
 
-class ConcurrentRestrictionJob < Resque::Plugins::RestrictionActiveJob
+class ConcurrentRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :concurrent => 1
 
   queue_as 'normal'
@@ -87,7 +87,7 @@ class ConcurrentRestrictionJob < Resque::Plugins::RestrictionActiveJob
   end
 end
 
-class MultipleRestrictionJob < Resque::Plugins::RestrictionActiveJob
+class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10, :per_300 => 2
 
   queue_as 'normal'
@@ -96,7 +96,7 @@ class MultipleRestrictionJob < Resque::Plugins::RestrictionActiveJob
   end
 end
 
-class MultiCallRestrictionJob < Resque::Plugins::RestrictionActiveJob
+class MultiCallRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
   restrict :per_300 => 2
 

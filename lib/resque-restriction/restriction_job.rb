@@ -112,7 +112,7 @@ module Resque
       end
     end
 
-    class RestrictionActiveJob < ActiveJob::Base
+    class RestrictionJob < ActiveJob::Base
       extend Restriction
 
       before_perform do |job|
@@ -132,15 +132,5 @@ module Resque
         "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
       end
     end
-
-    class RestrictionJob
-      extend Restriction
-
-      def self.restriction_queue_name
-        queue_name = Resque.queue_from_class(self)
-        "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
-      end
-    end
-
   end
 end

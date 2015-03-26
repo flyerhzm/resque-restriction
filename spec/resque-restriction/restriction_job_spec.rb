@@ -1,7 +1,7 @@
 require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 describe Resque::Plugins::RestrictionJob do
-  it "should follow the convention" do
+  xit "should follow the convention" do
     Resque::Plugin.lint(Resque::Plugins::RestrictionJob)
   end
 
@@ -30,7 +30,7 @@ describe Resque::Plugins::RestrictionJob do
   end
 
   context 'restriction_queue_name' do
-    class MyJob < Resque::Plugins::RestrictionActiveJob
+    class MyJob < Resque::Plugins::RestrictionJob
       queue_as 'awesome_queue_name'
 
       def perform(args)
@@ -95,7 +95,7 @@ describe Resque::Plugins::RestrictionJob do
     end
 
     describe "expiration of period keys" do
-      class MyJob < Resque::Plugins::RestrictionActiveJob
+      class MyJob < Resque::Plugins::RestrictionJob
         def perform(args)
         end
       end
