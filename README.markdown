@@ -41,15 +41,16 @@ You can also add customized restriction as you like. For example, we have a job 
 
 	class GenerateFacebookShares < Resque::Plugins::RestrictionJob
 	  restrict :per_day => 40
-    
+
 	  def self.restriction_identifier(options)
 	    [self.to_s, options["user_id"]].join(":")
 	  end
-    
+
 	  #rest of your class here
 	end
 
 options["user_id"] returns the user's facebook uid, the key point is that the different restriction_identifiers can restrict different job execution numbers.
+
 
 Contributing
 ------------
@@ -69,6 +70,8 @@ Richard Huang :: flyerhzm@gmail.com :: @flyerhzm
 Contributors
 ------------
 Matt Conway :: matt@conwaysplace.com :: @mattconway
+
+Martin Fourcade :: fourcade.m@gmail.com :: @mfourcade
 
 Copyright
 ---------

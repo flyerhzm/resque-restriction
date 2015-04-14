@@ -2,7 +2,7 @@ module Resque
   class Job
     class <<self
       alias_method :origin_reserve, :reserve
-      
+
       def reserve(queue)
         if queue =~ /^#{Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}/
           # If processing the restriction queue, when poping and pushing to end,
@@ -14,7 +14,7 @@ module Resque
             # and return
             payload = Resque.pop(queue)
             if payload
-              if ! constantize(payload['class']).repush(*payload['args'])
+              if !Object.const_get(payload['class']).repush(*payload['args'])
                 return new(queue, payload)
               end
             end

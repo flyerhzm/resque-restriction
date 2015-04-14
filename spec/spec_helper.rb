@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'spec/autorun'
 require 'mocha'
 
 dir = File.dirname(__FILE__)
@@ -38,53 +37,52 @@ puts "Starting redis for testing at localhost:9736..."
 `redis-server #{dir}/redis-test.conf`
 Resque.redis = 'localhost:9736'
 
-##
+#
 # Helper to perform job classes
 #
 module PerformJob
   def perform_job(klass, *args)
-    resque_job = Resque::Job.new(:testqueue, 'class' => klass, 'args' => args)
-    resque_job.perform
+    klass.perform_now(*args)
   end
 end
 
 class OneDayRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_day => 100
 
-  @queue = 'normal'
-  
-  def self.perform(args)
+  queue_as 'normal'
+
+  def perform(args)
   end
 end
 
 class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end
 
 class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
 
-  @queue = 'normal'
+  queue_as 'normal'
 
   def self.restriction_identifier(*args)
     [self.to_s, args.first].join(":")
   end
 
-  def self.perform(*args)
+  def perform(args)
   end
 end
 
 class ConcurrentRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :concurrent => 1
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(*args)
+  def perform(args)
     sleep 0.2
   end
 end
@@ -92,9 +90,9 @@ end
 class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10, :per_300 => 2
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end
 
@@ -102,8 +100,8 @@ class MultiCallRestrictionJob < Resque::Plugins::RestrictionJob
   restrict :per_hour => 10
   restrict :per_300 => 2
 
-  @queue = 'normal'
+  queue_as 'normal'
 
-  def self.perform(args)
+  def perform(args)
   end
 end

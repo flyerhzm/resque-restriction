@@ -1,5 +1,8 @@
+require 'active_job'
+
 module Resque
   module Plugins
+
     module Restriction
       SECONDS = {
         :per_minute => 60,
@@ -28,7 +31,6 @@ module Resque
           # if we get a 0 result back, the key wasn't set, so we know we are
           # already tracking the count for that period'
           period_active = ! Resque.redis.setnx(key, number.to_i - 1)
-
           # If we are already tracking that period, then decrement by one to
           # see if we are allowed to run, pushing to restriction queue to run
           # later if not.  Note that the value stored is the number of outstanding
@@ -76,10 +78,6 @@ module Resque
         self.to_s
       end
 
-      def restriction_queue_name
-        queue_name = Resque.queue_from_class(self)
-        "#{RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
-      end
 
       def seconds(period)
         if SECONDS.keys.include? period
@@ -114,9 +112,25 @@ module Resque
       end
     end
 
-    class RestrictionJob
+    class RestrictionJob < ActiveJob::Base
       extend Restriction
-    end
 
+      before_perform do |job|
+        self.class.before_perform_restriction(*job.arguments)
+      end
+
+      after_perform do |job|
+        self.class.after_perform_restriction(*job.arguments)
+      end
+
+      rescue_from(StandardError) do |err|
+        self.class.on_failure_restriction(err, *self.arguments)
+      end
+
+      def self.restriction_queue_name
+        queue_name = self.new.queue_name
+        "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
+      end
+    end
   end
 end
