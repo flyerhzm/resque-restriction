@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.description = "resque-restriction is an extension to resque queue system that restricts the execution number of certain jobs in a period time, the exceeded jobs will be executed at the next period."
   s.email = "flyerhzm@gmail.com"
   s.extra_rdoc_files = [
-    "CHANGELOG.md",
     "LICENSE",
     "README.markdown"
   ]
@@ -39,31 +38,22 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/flyerhzm/resque-restriction"
-  s.rubygems_version = "2.4.5.1"
+  s.rubygems_version = "2.4.8"
   s.summary = "resque-restriction is an extension to resque queue system that restricts the execution number of certain jobs in a period time."
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<rspec>, [">= 0"])
-      s.add_runtime_dependency(%q<mocha>, [">= 0"])
-      s.add_runtime_dependency(%q<jeweler>, [">= 0"])
-      s.add_runtime_dependency(%q<resque>, [">= 0"])
-      s.add_runtime_dependency(%q<activejob>, [">= 0"])
+      s.add_runtime_dependency(%q<resque-restriction>, [">= 0"])
+      s.add_runtime_dependency(%q<resque>, [">= 1.7.0"])
     else
-      s.add_dependency(%q<rspec>, [">= 0"])
-      s.add_dependency(%q<mocha>, [">= 0"])
-      s.add_dependency(%q<jeweler>, [">= 0"])
-      s.add_dependency(%q<resque>, [">= 0"])
-      s.add_dependency(%q<activejob>, [">= 0"])
+      s.add_dependency(%q<resque-restriction>, [">= 0"])
+      s.add_dependency(%q<resque>, [">= 1.7.0"])
     end
   else
-    s.add_dependency(%q<rspec>, [">= 0"])
-    s.add_dependency(%q<mocha>, [">= 0"])
-    s.add_dependency(%q<jeweler>, [">= 0"])
-    s.add_dependency(%q<resque>, [">= 0"])
-    s.add_dependency(%q<activejob>, [">= 0"])
+    s.add_dependency(%q<resque-restriction>, [">= 0"])
+    s.add_dependency(%q<resque>, [">= 1.7.0"])
   end
 end
 
