@@ -51,14 +51,12 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<jeweler>, [">= 0"])
       s.add_runtime_dependency(%q<resque>, [">= 0"])
       s.add_runtime_dependency(%q<activejob>, [">= 0"])
-      s.add_runtime_dependency(%q<resque>, [">= 1.7.0"])
     else
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<mocha>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<resque>, [">= 0"])
       s.add_dependency(%q<activejob>, [">= 0"])
-      s.add_dependency(%q<resque>, [">= 1.7.0"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 0"])
@@ -66,7 +64,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<resque>, [">= 0"])
     s.add_dependency(%q<activejob>, [">= 0"])
-    s.add_dependency(%q<resque>, [">= 1.7.0"])
   end
 end
 
