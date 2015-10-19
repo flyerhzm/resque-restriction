@@ -1,23 +1,9 @@
 require 'rake'
-require 'spec/rake/spectask'
-require 'rake/rdoctask'
+require 'rspec/core/rake_task'
 
-desc 'Default: run unit tests.'
+RSpec::Core::RakeTask.new(:spec)
+
 task :default => :spec
-
-desc 'Generate documentation for the resque-restriction plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'resque_restriction'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
-desc "Run all specs in spec directory"
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-end
 
 begin
   require 'jeweler'
