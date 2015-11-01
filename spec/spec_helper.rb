@@ -3,7 +3,6 @@ require 'mocha'
 
 dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
-require 'resque-restriction'
 
 #
 # make sure we can run redis
