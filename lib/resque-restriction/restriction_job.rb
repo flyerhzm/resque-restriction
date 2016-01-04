@@ -20,6 +20,8 @@ module Resque
       end
 
       def before_perform_restriction(*args)
+        return if Resque.inline?
+
         keys_decremented = []
         settings.each do |period, number|
           key = redis_key(period, *args)
