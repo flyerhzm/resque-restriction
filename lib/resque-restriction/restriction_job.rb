@@ -45,7 +45,7 @@ module Resque
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
               keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
-              Resque.push restriction_queue_name, :class => to_s, :args => args
+              Resque.push restriction_queue_name(args), :class => to_s, :args => args
               raise Resque::Job::DontPerform
             end
           else
@@ -102,7 +102,7 @@ module Resque
           break if has_restrictions
         end
         if has_restrictions
-          Resque.push restriction_queue_name, :class => to_s, :args => args
+          Resque.push restriction_queue_name(args), :class => to_s, :args => args
           return true
         else
           return false
@@ -129,8 +129,8 @@ module Resque
         self.class.on_failure_restriction(err, *self.arguments)
       end
 
-      def self.restriction_queue_name
-        queue_name = self.new.queue_name
+      def self.restriction_queue_name(args = [])
+        queue_name = self.new(*args).queue_name
         "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
       end
     end

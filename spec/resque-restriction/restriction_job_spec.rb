@@ -40,6 +40,25 @@ RSpec.describe Resque::Plugins::RestrictionJob do
     it 'concats restriction queue prefix with queue name' do
       expect(MyJob.restriction_queue_name).to eq("#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_awesome_queue_name")
     end
+
+    context 'when queue name is a block' do
+      let(:arguments) { [1] }
+      class MyJobWithDynamicQueueName < Resque::Plugins::RestrictionJob
+        queue_as do
+          "awesome_queue_name_with_argument_#{self.arguments.first}"
+        end
+
+        def perform(args)
+        end
+      end
+
+      it 'concats restriction queue prefix with queue name and correctly builds the queue name' do
+        expect(MyJobWithDynamicQueueName.restriction_queue_name(arguments)).to eq(
+          "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_" +
+            "awesome_queue_name_with_argument_#{arguments.first}"
+        )
+      end
+    end
   end
 
   context "resque" do
