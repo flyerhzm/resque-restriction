@@ -34,6 +34,4 @@ RSpec.describe Resque::Job do
     expect(OneHourRestrictionJob).to receive(:repush).exactly(3).times.and_return(true)
     Resque::Job.reserve('restriction_normal')
   end
-
-
 end

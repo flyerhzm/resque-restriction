@@ -1,8 +1,5 @@
-require 'active_job'
-
 module Resque
   module Plugins
-
     module Restriction
       SECONDS = {
         :per_minute => 60,
@@ -45,7 +42,7 @@ module Resque
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
               keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
-              Resque.push restriction_queue_name(args), :class => to_s, :args => args
+              Resque.push restriction_queue_name, :class => to_s, :args => args
               raise Resque::Job::DontPerform
             end
           else
@@ -80,6 +77,10 @@ module Resque
         self.to_s
       end
 
+      def restriction_queue_name
+        queue_name = Resque.queue_from_class(self)
+        "#{RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
+      end
 
       def seconds(period)
         if SECONDS.keys.include? period
@@ -102,7 +103,7 @@ module Resque
           break if has_restrictions
         end
         if has_restrictions
-          Resque.push restriction_queue_name(args), :class => to_s, :args => args
+          Resque.push restriction_queue_name, :class => to_s, :args => args
           return true
         else
           return false
@@ -111,27 +112,6 @@ module Resque
 
       def mark_restriction_key_to_expire_for(key, period)
         Resque.redis.expire(key, seconds(period)) unless period == :concurrent
-      end
-    end
-
-    class RestrictionJob < ActiveJob::Base
-      extend Restriction
-
-      before_perform do |job|
-        self.class.before_perform_restriction(*job.arguments)
-      end
-
-      after_perform do |job|
-        self.class.after_perform_restriction(*job.arguments)
-      end
-
-      rescue_from(StandardError) do |err|
-        self.class.on_failure_restriction(err, *self.arguments)
-      end
-
-      def self.restriction_queue_name(args = [])
-        queue_name = self.new(*args).queue_name
-        "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
       end
     end
   end

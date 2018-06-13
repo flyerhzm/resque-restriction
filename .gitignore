@@ -3,3 +3,4 @@ pkg/**
 .idea
 .rvmrc
 spec/stdout
+.rspec_status

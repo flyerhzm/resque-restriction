@@ -1,7 +1,7 @@
 resque-restriction
 ===============
 
-Resque Restriction is a plugin for the [Resque][0] queueing system (http://github.com/defunkt/resque). It adds two functions:
+Resque Restriction is a plugin for the [Resque](https://github.com/resque/resque) queueing system. It adds two functions:
 
 1. it will limit the execution number of certain jobs in a period time. For example, it can limit a certain job can be executed 1000 times per day, 100 time per hour and 30 times per 300 seconds.
 
@@ -12,12 +12,24 @@ Resque Restriction requires Resque 1.7.0.
 Attention
 ---------
 
-The <code>identifier</code> method is renamed to <code>restriction_identifier</code> to solve the confliction with resque-retry from version 0.3.0.
+The `identifier` method is renamed to `restriction_identifier` to solve the confliction with resque-retry from version 0.3.0.
 
 Install
 -------
 
-  sudo gem install resque-restriction
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'resque-restriction'
+```
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install resque-restriction
 
 To use
 ------
@@ -55,29 +67,4 @@ options["user_id"] returns the user's facebook uid, the key point is that the di
 Contributing
 ------------
 
-Once you've made your commits:
-
-1. [Fork][1] Resque Restriction
-2. Create a topic branch - `git checkout -b my_branch`
-3. Push to your branch - `git push origin my_branch`
-4. Create an [Issue][2] with a link to your branch
-5. That's it!
-
-Author
-------
-Richard Huang :: flyerhzm@gmail.com :: @flyerhzm
-
-Contributors
-------------
-Matt Conway :: matt@conwaysplace.com :: @mattconway
-
-Martin Fourcade :: fourcade.m@gmail.com :: @mfourcade
-
-Copyright
----------
-Copyright (c) 2010 Richard Huang. See LICENSE for details.
-
-[0]: http://github.com/defunkt/resque
-[1]: http://help.github.com/forking/
-[2]: http://github.com/flyerhzm/resque-restriction/issues
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/flyerhzm/resque-restriction.

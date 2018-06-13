@@ -1,22 +1,26 @@
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
+require 'spec_helper'
 
-RSpec.describe Resque::Plugins::RestrictionJob do
-  skip "should follow the convention" do
-    Resque::Plugin.lint(Resque::Plugins::RestrictionJob)
+RSpec.describe Resque::Plugins::Restriction do
+  it "should follow the convention" do
+    Resque::Plugin.lint(Resque::Plugins::Restriction)
   end
 
   context "redis_key" do
+    class MyJob
+      extend Resque::Plugins::Restriction
+    end
+
     it "should get redis_key with different period" do
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_minute)).to eq "Resque::Plugins::RestrictionJob:#{Time.now.to_i / 60}"
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_hour)).to eq "Resque::Plugins::RestrictionJob:#{Time.now.to_i / (60*60)}"
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_day)).to eq "Resque::Plugins::RestrictionJob:#{Time.now.to_i / (24*60*60)}"
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_month)).to eq "Resque::Plugins::RestrictionJob:#{Date.today.strftime("%Y-%m")}"
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_year)).to eq "Resque::Plugins::RestrictionJob:#{Date.today.year}"
+      expect(MyJob.redis_key(:per_minute)).to eq "MyJob:#{Time.now.to_i / 60}"
+      expect(MyJob.redis_key(:per_hour)).to eq "MyJob:#{Time.now.to_i / (60*60)}"
+      expect(MyJob.redis_key(:per_day)).to eq "MyJob:#{Time.now.to_i / (24*60*60)}"
+      expect(MyJob.redis_key(:per_month)).to eq "MyJob:#{Date.today.strftime("%Y-%m")}"
+      expect(MyJob.redis_key(:per_year)).to eq "MyJob:#{Date.today.year}"
     end
 
     it "should accept customization" do
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_1800)).to eq "Resque::Plugins::RestrictionJob:#{Time.now.to_i / 1800}"
-      expect(Resque::Plugins::RestrictionJob.redis_key(:per_7200)).to eq "Resque::Plugins::RestrictionJob:#{Time.now.to_i / 7200}"
+      expect(MyJob.redis_key(:per_1800)).to eq "MyJob:#{Time.now.to_i / 1800}"
+      expect(MyJob.redis_key(:per_7200)).to eq "MyJob:#{Time.now.to_i / 7200}"
     end
   end
 
@@ -30,34 +34,17 @@ RSpec.describe Resque::Plugins::RestrictionJob do
   end
 
   context 'restriction_queue_name' do
-    class MyJob < Resque::Plugins::RestrictionJob
-      queue_as 'awesome_queue_name'
+    class MyJob
+      extend Resque::Plugins::Restriction
 
-      def perform(args)
+      @queue = 'awesome_queue_name'
+
+      def self.perform(*args)
       end
     end
 
     it 'concats restriction queue prefix with queue name' do
       expect(MyJob.restriction_queue_name).to eq("#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_awesome_queue_name")
-    end
-
-    context 'when queue name is a block' do
-      let(:arguments) { [1] }
-      class MyJobWithDynamicQueueName < Resque::Plugins::RestrictionJob
-        queue_as do
-          "awesome_queue_name_with_argument_#{self.arguments.first}"
-        end
-
-        def perform(args)
-        end
-      end
-
-      it 'concats restriction queue prefix with queue name and correctly builds the queue name' do
-        expect(MyJobWithDynamicQueueName.restriction_queue_name(arguments)).to eq(
-          "#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_" +
-            "awesome_queue_name_with_argument_#{arguments.first}"
-        )
-      end
     end
   end
 
@@ -100,7 +87,7 @@ RSpec.describe Resque::Plugins::RestrictionJob do
     end
 
     it "should increment execution number when concurrent job fails" do
-      expect_any_instance_of(ConcurrentRestrictionJob).to receive(:perform).and_raise("bad")
+      expect(ConcurrentRestrictionJob).to receive(:perform).and_raise("bad")
       perform_job(ConcurrentRestrictionJob, "any args") rescue nil
       expect(Resque.redis.get(ConcurrentRestrictionJob.redis_key(:concurrent))).to eq "1"
     end
@@ -114,8 +101,10 @@ RSpec.describe Resque::Plugins::RestrictionJob do
     end
 
     describe "expiration of period keys" do
-      class MyJob < Resque::Plugins::RestrictionJob
-        def perform(args)
+      class MyJob
+        extend Resque::Plugins::Restriction
+
+        def self.perform(*args)
         end
       end
 
@@ -235,7 +224,6 @@ RSpec.describe Resque::Plugins::RestrictionJob do
         expect(Resque).not_to receive(:push)
         expect(OneHourRestrictionJob.repush('any args')).to be(false)
       end
-
     end
   end
 end

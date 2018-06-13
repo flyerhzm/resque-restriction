@@ -1,9 +1,17 @@
-require 'rubygems'
-require 'mocha'
+require 'bundler/setup'
+require 'resque/restriction'
 
-dir = File.dirname(__FILE__)
-$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
-require 'resque-restriction'
+RSpec.configure do |config|
+  # Enable flags like --only-failures and --next-failure
+  config.example_status_persistence_file_path = ".rspec_status"
+
+  # Disable RSpec exposing methods globally on `Module` and `main`
+  config.disable_monkey_patching!
+
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+end
 
 #
 # make sure we can run redis
@@ -15,6 +23,7 @@ if !system("which redis-server")
   abort ''
 end
 
+dir = File.dirname(__FILE__)
 
 #
 # start our own redis when the tests start,
@@ -42,66 +51,79 @@ Resque.redis = 'localhost:9736'
 #
 module PerformJob
   def perform_job(klass, *args)
-    klass.perform_now(*args)
+    resque_job = Resque::Job.new(:testqueue, 'class' => klass, 'args' => args)
+    resque_job.perform
   end
 end
 
-class OneDayRestrictionJob < Resque::Plugins::RestrictionJob
+class OneDayRestrictionJob
+  extend Resque::Plugins::Restriction
+
   restrict :per_day => 100
 
-  queue_as 'normal'
+  @queue = 'normal'
 
-  def perform(args)
+  def self.perform(*args)
   end
 end
 
-class OneHourRestrictionJob < Resque::Plugins::RestrictionJob
+class OneHourRestrictionJob
+  extend Resque::Plugins::Restriction
+
   restrict :per_hour => 10
 
-  queue_as 'normal'
+  @queue = 'normal'
 
-  def perform(args)
+  def self.perform(*args)
   end
 end
 
-class IdentifiedRestrictionJob < Resque::Plugins::RestrictionJob
+class IdentifiedRestrictionJob
+  extend Resque::Plugins::Restriction
+
   restrict :per_hour => 10
 
-  queue_as 'normal'
+  @queue = 'normal'
 
   def self.restriction_identifier(*args)
     [self.to_s, args.first].join(":")
   end
 
-  def perform(args)
+  def self.perform(*args)
   end
 end
 
-class ConcurrentRestrictionJob < Resque::Plugins::RestrictionJob
+class ConcurrentRestrictionJob
+  extend Resque::Plugins::Restriction
+
   restrict :concurrent => 1
 
-  queue_as 'normal'
+  @queue = 'normal'
 
-  def perform(args)
+  def self.perform(*args)
     sleep 0.2
   end
 end
 
-class MultipleRestrictionJob < Resque::Plugins::RestrictionJob
+class MultipleRestrictionJob
+  extend Resque::Plugins::Restriction
+
   restrict :per_hour => 10, :per_300 => 2
 
-  queue_as 'normal'
+  @queue = 'normal'
 
-  def perform(args)
+  def self.perform(*args)
   end
 end
 
-class MultiCallRestrictionJob < Resque::Plugins::RestrictionJob
+class MultiCallRestrictionJob
+  extend Resque::Plugins::Restriction
+
   restrict :per_hour => 10
   restrict :per_300 => 2
 
-  queue_as 'normal'
+  @queue = 'normal'
 
-  def perform(args)
+  def self.perform(*args)
   end
 end
