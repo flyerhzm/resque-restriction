@@ -36,7 +36,9 @@ To use
 
 It is especially useful when a system has an email invitation resque job, because sending emails too frequentyly will be treated as a spam. What you should do for the InvitationJob is to inherit it from Resque::Plugins::RestrictionJob class and add restrict definition. Example:
 
-	class InvitationJob < Resque::Plugins::RestrictionJob
+	class InvitationJob
+    extend Resque::Plugins::RestrictionJob
+
 	  restrict :per_day => 1000, :per_hour => 100, :per_300 => 30
 
 	  #rest of your class here
@@ -51,7 +53,9 @@ Advance
 
 You can also add customized restriction as you like. For example, we have a job to restrict the facebook post numbers 40 times per user per day, we can define as:
 
-	class GenerateFacebookShares < Resque::Plugins::RestrictionJob
+	class GenerateFacebookShares
+    extend Resque::Plugins::RestrictionJob
+
 	  restrict :per_day => 40
 
 	  def self.restriction_identifier(options)
