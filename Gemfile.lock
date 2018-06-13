@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    resque-restriction (0.4.2)
+    resque-restriction (0.5.0)
 
 GEM
   remote: https://rubygems.org/
