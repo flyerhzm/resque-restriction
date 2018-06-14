@@ -1,6 +1,8 @@
 resque-restriction
 ===============
 
+[![Build Status](https://secure.travis-ci.org/flyerhzm/resque-restriction.png)](http://travis-ci.org/flyerhzm/resque-restriction)
+
 Resque Restriction is a plugin for the [Resque](https://github.com/resque/resque) queueing system. It adds two functions:
 
 1. it will limit the execution number of certain jobs in a period time. For example, it can limit a certain job can be executed 1000 times per day, 100 time per hour and 30 times per 300 seconds.
