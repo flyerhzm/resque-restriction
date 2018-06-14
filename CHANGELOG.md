@@ -1,5 +1,7 @@
 ### Unreleased
 
+* prepend restriction to cache_key
+
 # 0.5.0
 
 * drop activejob support
