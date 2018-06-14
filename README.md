@@ -1,6 +1,7 @@
 resque-restriction
 ===============
 
+[![AwesomeCode Status for flyerhzm/resque-restriction](https://awesomecode.io/projects/ebc1a493-78f5-4d8a-9bb7-097fdaa657ec/status)](https://awesomecode.io/projects/107)
 [![Build Status](https://secure.travis-ci.org/flyerhzm/resque-restriction.png)](http://travis-ci.org/flyerhzm/resque-restriction)
 
 Resque Restriction is a plugin for the [Resque](https://github.com/resque/resque) queueing system. It adds two functions:
