@@ -64,13 +64,15 @@ module Resque
       end
 
       def redis_key(period, *args)
-        period_str = case period
+        period_key, custom_key = period.to_s.split('_and_')
+        period_str = case period_key.to_sym
                      when :concurrent then "*"
-                     when :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period]).to_s
+                     when :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
                      when :per_month then Date.today.strftime("%Y-%m")
                      when :per_year then Date.today.year.to_s
-                     else period.to_s =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
-        [RESTRICTION_QUEUE_PREFIX, self.restriction_identifier(*args), period_str].compact.join(":")
+                     else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
+        custom_value = (custom_key && args.first && args.first.is_a?(Hash)) ? args.first[custom_key] : nil
+        [RESTRICTION_QUEUE_PREFIX, self.restriction_identifier(*args), custom_value, period_str].compact.join(":")
       end
 
       def restriction_identifier(*args)
@@ -83,10 +85,11 @@ module Resque
       end
 
       def seconds(period)
-        if SECONDS.keys.include? period
-          SECONDS[period]
+        period_key, _ = period.to_s.split('_and_')
+        if SECONDS.keys.include?(period_key.to_sym)
+          SECONDS[period_key.to_sym]
         else
-          period.to_s =~ /^per_(\d+)$/ and $1.to_i
+          period_key =~ /^per_(\d+)$/ and $1.to_i
         end
       end
 

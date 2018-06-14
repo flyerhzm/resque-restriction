@@ -6,21 +6,37 @@ RSpec.describe Resque::Plugins::Restriction do
   end
 
   context "redis_key" do
-    class MyJob
-      extend Resque::Plugins::Restriction
-    end
-
     it "should get redis_key with different period" do
-      expect(MyJob.redis_key(:per_minute)).to eq "MyJob:#{Time.now.to_i / 60}"
-      expect(MyJob.redis_key(:per_hour)).to eq "MyJob:#{Time.now.to_i / (60*60)}"
-      expect(MyJob.redis_key(:per_day)).to eq "MyJob:#{Time.now.to_i / (24*60*60)}"
-      expect(MyJob.redis_key(:per_month)).to eq "MyJob:#{Date.today.strftime("%Y-%m")}"
-      expect(MyJob.redis_key(:per_year)).to eq "MyJob:#{Date.today.year}"
+      expect(MyJob.redis_key(:per_minute)).to eq "restriction:MyJob:#{Time.now.to_i / 60}"
+      expect(MyJob.redis_key(:per_hour)).to eq "restriction:MyJob:#{Time.now.to_i / (60*60)}"
+      expect(MyJob.redis_key(:per_day)).to eq "restriction:MyJob:#{Time.now.to_i / (24*60*60)}"
+      expect(MyJob.redis_key(:per_month)).to eq "restriction:MyJob:#{Date.today.strftime("%Y-%m")}"
+      expect(MyJob.redis_key(:per_year)).to eq "restriction:MyJob:#{Date.today.year}"
+      expect(MyJob.redis_key(:per_minute_and_foo, 'foo' => 'bar')).to eq "restriction:MyJob:bar:#{Time.now.to_i / 60}"
     end
 
     it "should accept customization" do
-      expect(MyJob.redis_key(:per_1800)).to eq "MyJob:#{Time.now.to_i / 1800}"
-      expect(MyJob.redis_key(:per_7200)).to eq "MyJob:#{Time.now.to_i / 7200}"
+      expect(MyJob.redis_key(:per_1800)).to eq "restriction:MyJob:#{Time.now.to_i / 1800}"
+      expect(MyJob.redis_key(:per_7200)).to eq "restriction:MyJob:#{Time.now.to_i / 7200}"
+      expect(MyJob.redis_key(:per_1800_and_foo, 'foo' => 'bar')).to eq "restriction:MyJob:bar:#{Time.now.to_i / 1800}"
+    end
+  end
+
+  context "seconds" do
+    it "should get seconds with different period" do
+      expect(MyJob.seconds(:per_minute)).to eq 60
+      expect(MyJob.seconds(:per_hour)).to eq 60*60
+      expect(MyJob.seconds(:per_day)).to eq 24*60*60
+      expect(MyJob.seconds(:per_week)).to eq 7*24*60*60
+      expect(MyJob.seconds(:per_month)).to eq 31*24*60*60
+      expect(MyJob.seconds(:per_year)).to eq 366*24*60*60
+      expect(MyJob.seconds(:per_minute_and_foo)).to eq 60
+    end
+
+    it "should accept customization" do
+      expect(MyJob.seconds(:per_1800)).to eq 1800
+      expect(MyJob.seconds(:per_7200)).to eq 7200
+      expect(MyJob.seconds(:per_1800_and_foo)).to eq 1800
     end
   end
 
@@ -34,15 +50,6 @@ RSpec.describe Resque::Plugins::Restriction do
   end
 
   context 'restriction_queue_name' do
-    class MyJob
-      extend Resque::Plugins::Restriction
-
-      @queue = 'awesome_queue_name'
-
-      def self.perform(*args)
-      end
-    end
-
     it 'concats restriction queue prefix with queue name' do
       expect(MyJob.restriction_queue_name).to eq("#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_awesome_queue_name")
     end

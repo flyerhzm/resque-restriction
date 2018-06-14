@@ -56,6 +56,12 @@ module PerformJob
   end
 end
 
+class MyJob
+  extend Resque::Plugins::Restriction
+
+  @queue = 'awesome_queue_name'
+end
+
 class OneDayRestrictionJob
   extend Resque::Plugins::Restriction
 
