@@ -31,15 +31,16 @@ dir = File.dirname(__FILE__)
 #
 
 at_exit do
-  next if $!
-
-  exit_code = Spec::Runner.run
+  status_code = if $!.nil? || $!.is_a?(SystemExit) && $!.success?
+                  0
+                else
+                  $!.is_a?(SystemExit) ? $!.status : 1
+                end
 
   pid = `ps -e -o pid,command | grep [r]edis-test`.split(" ")[0]
   puts "Killing test redis server [#{pid}]..."
   `rm -f #{dir}/dump.rdb`
-  Process.kill("KILL", pid.to_i)
-  exit exit_code
+  exit status_code
 end
 
 puts "Starting redis for testing at localhost:9736..."
