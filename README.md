@@ -36,13 +36,15 @@ To use
 
 It is especially useful when a system has an email invitation resque job, because sending emails too frequentyly will be treated as a spam. What you should do for the InvitationJob is to inherit it from Resque::Plugins::RestrictionJob class and add restrict definition. Example:
 
-  class InvitationJob
-    extend Resque::Plugins::RestrictionJob
+```ruby
+class InvitationJob
+  extend Resque::Plugins::Restriction
 
-    restrict :per_day => 1000, :per_hour => 100, :per_300 => 30
+  restrict :per_day => 1000, :per_hour => 100, :per_300 => 30
 
-    #rest of your class here
-  end
+  # rest of your class here
+end
+```
 
 That means the InvitationJob can not be executed more than 1000 times per day, 100 times per hour and 30 times per 300 seconds.  All restrictions have to be met for the job to execute.
 
@@ -53,17 +55,19 @@ Advance
 
 You can also add customized restriction as you like. For example, we have a job to restrict the facebook post numbers 40 times per user per day, we can define as:
 
-  class GenerateFacebookShares
-    extend Resque::Plugins::RestrictionJob
+```ruby
+class GenerateFacebookShares
+  extend Resque::Plugins::Restriction
 
-    restrict :per_day => 40
+  restrict :per_day => 40
 
-    def self.restriction_identifier(options)
-      [self.to_s, options["user_id"]].join(":")
-    end
-
-    #rest of your class here
+  def self.restriction_identifier(options)
+    [self.to_s, options["user_id"]].join(":")
   end
+
+  # rest of your class here
+end
+```
 
 options["user_id"] returns the user's facebook uid, the key point is that the different restriction_identifiers can restrict different job execution numbers.
 
