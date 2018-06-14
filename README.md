@@ -59,6 +59,20 @@ Advance
 
 You can also add customized restriction as you like. For example, we have a job to restrict the facebook post numbers 40 times per user per day, we can define as:
 
+
+```ruby
+class GenerateFacebookShares
+  extend Resque::Plugins::Restriction
+
+  restrict :per_day_and_user_id => 40
+
+  # rest of your class here
+  def self.perform(options)
+    # options["user_id"] exists
+  end
+end
+```
+
 ```ruby
 class GenerateFacebookShares
   extend Resque::Plugins::Restriction
