@@ -9,6 +9,10 @@ Resque Restriction is a plugin for the [Resque](https://github.com/resque/resque
 
 Resque Restriction requires Resque 1.7.0.
 
+*Please make sure your workers are checking restriction_xxx queue.*.
+e.g., if you add restriction plugin to high_priority queue, you need to
+check restriction_high_priority queue.
+
 Attention
 ---------
 
