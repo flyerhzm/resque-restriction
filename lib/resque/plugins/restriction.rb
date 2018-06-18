@@ -42,7 +42,6 @@ module Resque
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
               keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
-              Resque.push restriction_queue_name, :class => to_s, :args => args
               raise Resque::Job::DontPerform
             end
           else
@@ -93,23 +92,11 @@ module Resque
         end
       end
 
-      # if job is still restricted, push back to restriction queue, otherwise push
-      # to real queue.  Since the restrictions will be checked again when run from
-      # real queue, job will just get pushed back onto restriction queue then if
-      # restriction conditions have changed
-      def repush(*args)
-        has_restrictions = false
-        settings.each do |period, number|
+      def reach_restriction?(*args)
+        settings.any? do |period, number|
           key = redis_key(period, *args)
           value = Resque.redis.get(key)
-          has_restrictions = value && value != "" && value.to_i <= 0
-          break if has_restrictions
-        end
-        if has_restrictions
-          Resque.push restriction_queue_name, :class => to_s, :args => args
-          return true
-        else
-          return false
+          value && value != "" && value.to_i <= 0
         end
       end
 

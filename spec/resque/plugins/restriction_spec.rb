@@ -102,9 +102,7 @@ RSpec.describe Resque::Plugins::Restriction do
     it "should put the job into restriction queue when execution count < 0" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 0)
       result = perform_job(OneHourRestrictionJob, "any args")
-      # expect(result).to_not be(true)
       expect(Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour))).to eq "0"
-      expect(Resque.redis.lrange("queue:restriction_normal", 0, -1)).to eq [Resque.encode(:class => "OneHourRestrictionJob", :args => ["any args"])]
     end
 
     describe "expiration of period keys" do
@@ -219,17 +217,15 @@ RSpec.describe Resque::Plugins::Restriction do
       end
     end
 
-    context "repush" do
+    context "reach_restriction" do
       it "should push restricted jobs onto restriction queue" do
         Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
-        expect(Resque).to receive(:push).once.with('restriction_normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
-        expect(OneHourRestrictionJob.repush('any args')).to be(true)
+        expect(OneHourRestrictionJob).to be_reach_restriction
       end
 
       it "should not push unrestricted jobs onto restriction queue" do
         Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 1)
-        expect(Resque).not_to receive(:push)
-        expect(OneHourRestrictionJob.repush('any args')).to be(false)
+        expect(OneHourRestrictionJob).not_to be_reach_restriction
       end
     end
   end
