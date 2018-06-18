@@ -42,16 +42,10 @@ RSpec.describe Resque::Plugins::Restriction do
 
   context "settings" do
     it "get correct number to restriction jobs" do
-      expect(OneDayRestrictionJob.settings).to eq({:per_day => 100})
-      expect(OneHourRestrictionJob.settings).to eq({:per_hour => 10})
-      expect(MultipleRestrictionJob.settings).to eq({:per_hour => 10, :per_300 => 2})
-      expect(MultiCallRestrictionJob.settings).to eq({:per_hour => 10, :per_300 => 2})
-    end
-  end
-
-  context 'restriction_queue_name' do
-    it 'concats restriction queue prefix with queue name' do
-      expect(MyJob.restriction_queue_name).to eq("#{Resque::Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}_awesome_queue_name")
+      expect(OneDayRestrictionJob.restriction_settings).to eq({:per_day => 100})
+      expect(OneHourRestrictionJob.restriction_settings).to eq({:per_hour => 10})
+      expect(MultipleRestrictionJob.restriction_settings).to eq({:per_hour => 10, :per_300 => 2})
+      expect(MultiCallRestrictionJob.restriction_settings).to eq({:per_hour => 10, :per_300 => 2})
     end
   end
 

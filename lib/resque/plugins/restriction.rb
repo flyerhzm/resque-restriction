@@ -9,21 +9,20 @@ module Resque
         :per_month => 31*24*60*60,
         :per_year => 366*24*60*60
       }
-      RESTRICTION_QUEUE_PREFIX = 'restriction'
 
-      def settings
+      def restriction_settings
         @options ||= {}
       end
 
       def restrict(options={})
-        settings.merge!(options)
+        restriction_settings.merge!(options)
       end
 
       def before_perform_restriction(*args)
         return if Resque.inline?
 
         keys_decremented = []
-        settings.each do |period, number|
+        restriction_settings.each do |period, number|
           key = redis_key(period, *args)
 
           # first try to set period key to be the total allowed for the period
@@ -52,7 +51,7 @@ module Resque
       end
 
       def after_perform_restriction(*args)
-        if settings[:concurrent]
+        if restriction_settings[:concurrent]
           key = redis_key(:concurrent, *args)
           Resque.redis.incrby(key, 1)
         end
@@ -71,16 +70,11 @@ module Resque
                      when :per_year then Date.today.year.to_s
                      else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
         custom_value = (custom_key && args.first && args.first.is_a?(Hash)) ? args.first[custom_key] : nil
-        [RESTRICTION_QUEUE_PREFIX, self.restriction_identifier(*args), custom_value, period_str].compact.join(":")
+        ['restriction', self.restriction_identifier(*args), custom_value, period_str].compact.join(":")
       end
 
       def restriction_identifier(*args)
         self.to_s
-      end
-
-      def restriction_queue_name
-        queue_name = Resque.queue_from_class(self)
-        "#{RESTRICTION_QUEUE_PREFIX}_#{queue_name}"
       end
 
       def seconds(period)
@@ -93,7 +87,7 @@ module Resque
       end
 
       def reach_restriction?(*args)
-        settings.any? do |period, number|
+        restriction_settings.any? do |period, number|
           key = redis_key(period, *args)
           value = Resque.redis.get(key)
           value && value != "" && value.to_i <= 0
