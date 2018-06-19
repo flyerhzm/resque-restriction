@@ -15,7 +15,7 @@ RSpec.describe Resque::Job do
       end
     end
 
-    context 'do not reach restriction' do
+    context 'not reach restriction' do
       it "should pop job" do
         Resque.push('normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
         expect(Resque::Job.reserve('normal')).to eq Resque::Job.new('normal', {'class' => 'OneHourRestrictionJob', 'args' => ['any args']})

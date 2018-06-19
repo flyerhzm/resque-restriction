@@ -8,7 +8,8 @@ module Resque
         job_class = Object.const_get(payload['class'])
 
         # hold if it reaches restriction.
-        return if job_class.respond_to?(:restriction_settings) && job_class.reach_restriction?(payload)
+        return if job_class.respond_to?(:restriction_settings) && job_class.reach_restriction?(*payload['args']) == true
+        job_class.reset_concurrent_restriction(*payload['args'])
 
         origin_reserve(queue)
       end

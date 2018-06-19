@@ -18,9 +18,7 @@ module Resque
         restriction_settings.merge!(options)
       end
 
-      def before_perform_restriction(*args)
-        return if Resque.inline?
-
+      def reach_restriction?(*args)
         keys_decremented = []
         restriction_settings.each do |period, number|
           key = redis_key(period, *args)
@@ -41,7 +39,7 @@ module Resque
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
               keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
-              raise Resque::Job::DontPerform
+              return true
             end
           else
             # This is the first time we set the key, so we mark it to expire
@@ -50,15 +48,11 @@ module Resque
         end
       end
 
-      def after_perform_restriction(*args)
+      def reset_concurrent_restriction(*args)
         if restriction_settings[:concurrent]
           key = redis_key(:concurrent, *args)
           Resque.redis.incrby(key, 1)
         end
-      end
-
-      def on_failure_restriction(ex, *args)
-        after_perform_restriction(*args)
       end
 
       def redis_key(period, *args)
@@ -83,14 +77,6 @@ module Resque
           SECONDS[period_key.to_sym]
         else
           period_key =~ /^per_(\d+)$/ and $1.to_i
-        end
-      end
-
-      def reach_restriction?(*args)
-        restriction_settings.any? do |period, number|
-          key = redis_key(period, *args)
-          value = Resque.redis.get(key)
-          value && value != "" && value.to_i <= 0
         end
       end
 
