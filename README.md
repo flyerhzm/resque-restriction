@@ -55,7 +55,7 @@ end
 
 That means the InvitationJob can not be executed more than 1000 times per day, 100 times per hour and 30 times per 300 seconds.  All restrictions have to be met for the job to execute.
 
-The argument of restrict method is a hash, the key of the hash is a period time, including :concurrent, :per_minute, :per_hour, :per_day, :per_week, :per_month, :per_year, and you can also define any period like :per_300 means per 300 seconds. The value of the hash is the job execution limit number in a period.  The :concurrent option restricts the number of jobs that run simultaneously.
+The argument of restrict method is a hash, the key of the hash is a period time, including :concurrent, :per_second, :per_minute, :per_hour, :per_day, :per_week, :per_month, :per_year, and you can also define any period like :per_300 means per 300 seconds. The value of the hash is the job execution limit number in a period.  The :concurrent option restricts the number of jobs that run simultaneously.
 
 Advance
 -------

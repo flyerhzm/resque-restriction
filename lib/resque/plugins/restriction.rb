@@ -2,6 +2,7 @@ module Resque
   module Plugins
     module Restriction
       SECONDS = {
+        :per_second => 1,
         :per_minute => 60,
         :per_hour => 60*60,
         :per_day => 24*60*60,
@@ -59,7 +60,7 @@ module Resque
         period_key, custom_key = period.to_s.split('_and_')
         period_str = case period_key.to_sym
                      when :concurrent then "*"
-                     when :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
+                     when :per_second, :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
                      when :per_month then Date.today.strftime("%Y-%m")
                      when :per_year then Date.today.year.to_s
                      else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
