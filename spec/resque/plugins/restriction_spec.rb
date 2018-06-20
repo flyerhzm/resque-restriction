@@ -55,14 +55,14 @@ RSpec.describe Resque::Plugins::Restriction do
     end
 
     it "should set execution number and decrement it when one job first executed" do
-      OneHourRestrictionJob.reach_restriction?("any args")
+      expect(OneHourRestrictionJob.reach_restriction?("any args")).to be_falsey
       expect(Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour))).to eq "9"
     end
 
     it "should use restriction_identifier to set exclusive execution counts" do
-      IdentifiedRestrictionJob.reach_restriction?(1)
-      IdentifiedRestrictionJob.reach_restriction?(1)
-      IdentifiedRestrictionJob.reach_restriction?(2)
+      expect(IdentifiedRestrictionJob.reach_restriction?(1)).to be_falsey
+      expect(IdentifiedRestrictionJob.reach_restriction?(1)).to be_falsey
+      expect(IdentifiedRestrictionJob.reach_restriction?(2)).to be_falsey
 
       expect(Resque.redis.get(IdentifiedRestrictionJob.redis_key(:per_hour, 1))).to eq "8"
       expect(Resque.redis.get(IdentifiedRestrictionJob.redis_key(:per_hour, 2))).to eq "9"
@@ -70,15 +70,14 @@ RSpec.describe Resque::Plugins::Restriction do
 
     it "should decrement execution number when one job executed" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 6)
-      OneHourRestrictionJob.reach_restriction?("any args")
+      expect(OneHourRestrictionJob.reach_restriction?("any args")).to be_falsey
 
       expect(Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour))).to eq "5"
     end
 
     it "should put the job into restriction queue when execution count < 0" do
       Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), 0)
-      result = OneHourRestrictionJob.reach_restriction?("any args")
-      expect(result).to be_truthy
+      expect(OneHourRestrictionJob.reach_restriction?("any args")).to be_truthy
       expect(Resque.redis.get(OneHourRestrictionJob.redis_key(:per_hour))).to eq "0"
     end
 

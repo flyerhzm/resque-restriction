@@ -47,6 +47,7 @@ module Resque
             mark_restriction_key_to_expire_for(key, period)
           end
         end
+        false
       end
 
       def reset_concurrent_restriction(*args)
