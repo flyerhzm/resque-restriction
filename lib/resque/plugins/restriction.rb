@@ -76,7 +76,7 @@ module Resque
       end
 
       def seconds(period)
-        period_key, _ = period.to_s.split('_and_')
+        period_key, = period.to_s.split('_and_')
         if SECONDS.key?(period_key.to_sym)
           SECONDS[period_key.to_sym]
         else
