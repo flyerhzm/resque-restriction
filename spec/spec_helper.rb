@@ -66,7 +66,7 @@ end
 class OneDayRestrictionJob
   extend Resque::Plugins::Restriction
 
-  restrict :per_day => 100
+  restrict per_day: 100
 
   @queue = 'normal'
 
@@ -76,7 +76,7 @@ end
 class OneHourRestrictionJob
   extend Resque::Plugins::Restriction
 
-  restrict :per_hour => 10
+  restrict per_hour: 10
 
   @queue = 'normal'
 
@@ -86,7 +86,7 @@ end
 class IdentifiedRestrictionJob
   extend Resque::Plugins::Restriction
 
-  restrict :per_hour => 10
+  restrict per_hour: 10
 
   @queue = 'normal'
 
@@ -100,7 +100,7 @@ end
 class ConcurrentRestrictionJob
   extend Resque::Plugins::Restriction
 
-  restrict :concurrent => 1
+  restrict concurrent: 1
 
   @queue = 'normal'
 
@@ -112,7 +112,7 @@ end
 class MultipleRestrictionJob
   extend Resque::Plugins::Restriction
 
-  restrict :per_hour => 10, :per_300 => 2
+  restrict per_hour: 10, per_300: 2
 
   @queue = 'normal'
 
@@ -122,8 +122,8 @@ end
 class MultiCallRestrictionJob
   extend Resque::Plugins::Restriction
 
-  restrict :per_hour => 10
-  restrict :per_300 => 2
+  restrict per_hour: 10
+  restrict per_300: 2
 
   @queue = 'normal'
 

@@ -2,13 +2,13 @@ module Resque
   module Plugins
     module Restriction
       SECONDS = {
-        :per_second => 1,
-        :per_minute => 60,
-        :per_hour => 60 * 60,
-        :per_day => 24 * 60 * 60,
-        :per_week => 7 * 24 * 60 * 60,
-        :per_month => 31 * 24 * 60 * 60,
-        :per_year => 366 * 24 * 60 * 60
+        per_second: 1,
+        per_minute: 60,
+        per_hour: 60 * 60,
+        per_day: 24 * 60 * 60,
+        per_week: 7 * 24 * 60 * 60,
+        per_month: 31 * 24 * 60 * 60,
+        per_year: 366 * 24 * 60 * 60
       }
 
       def restriction_settings

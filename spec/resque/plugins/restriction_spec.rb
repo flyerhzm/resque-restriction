@@ -42,10 +42,10 @@ RSpec.describe Resque::Plugins::Restriction do
 
   describe ".restriction_settings" do
     it "get correct number to restriction jobs" do
-      expect(OneDayRestrictionJob.restriction_settings).to eq(:per_day => 100)
-      expect(OneHourRestrictionJob.restriction_settings).to eq(:per_hour => 10)
-      expect(MultipleRestrictionJob.restriction_settings).to eq(:per_hour => 10, :per_300 => 2)
-      expect(MultiCallRestrictionJob.restriction_settings).to eq(:per_hour => 10, :per_300 => 2)
+      expect(OneDayRestrictionJob.restriction_settings).to eq(per_day: 100)
+      expect(OneHourRestrictionJob.restriction_settings).to eq(per_hour: 10)
+      expect(MultipleRestrictionJob.restriction_settings).to eq(per_hour: 10, per_300: 2)
+      expect(MultiCallRestrictionJob.restriction_settings).to eq(per_hour: 10, per_300: 2)
     end
   end
 
