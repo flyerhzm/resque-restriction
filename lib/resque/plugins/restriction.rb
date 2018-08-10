@@ -65,7 +65,7 @@ module Resque
                      when :per_month then Date.today.strftime("%Y-%m")
                      when :per_year then Date.today.year.to_s
                      else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
-        custom_value = (custom_key && args.first && args.first.is_a?(Hash)) ? args.first[custom_key] : nil
+        custom_value = custom_key && args.first && args.first.is_a?(Hash) ? args.first[custom_key] : nil
         ['restriction', self.restriction_identifier(*args), custom_value, period_str].compact.join(":")
       end
 
