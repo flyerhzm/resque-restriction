@@ -4,18 +4,18 @@ module Resque
       SECONDS = {
         :per_second => 1,
         :per_minute => 60,
-        :per_hour => 60*60,
-        :per_day => 24*60*60,
-        :per_week => 7*24*60*60,
-        :per_month => 31*24*60*60,
-        :per_year => 366*24*60*60
+        :per_hour => 60 * 60,
+        :per_day => 24 * 60 * 60,
+        :per_week => 7 * 24 * 60 * 60,
+        :per_month => 31 * 24 * 60 * 60,
+        :per_year => 366 * 24 * 60 * 60
       }
 
       def restriction_settings
         @options ||= {}
       end
 
-      def restrict(options={})
+      def restrict(options = {})
         restriction_settings.merge!(options)
       end
 
@@ -27,7 +27,7 @@ module Resque
           # first try to set period key to be the total allowed for the period
           # if we get a 0 result back, the key wasn't set, so we know we are
           # already tracking the count for that period'
-          period_active = ! Resque.redis.setnx(key, number.to_i - 1)
+          period_active = !Resque.redis.setnx(key, number.to_i - 1)
           # If we are already tracking that period, then decrement by one to
           # see if we are allowed to run, pushing to restriction queue to run
           # later if not.  Note that the value stored is the number of outstanding
@@ -39,7 +39,7 @@ module Resque
             if value < 0
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
-              keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
+              keys_decremented.each { |k| Resque.redis.incrby(k, 1) }
               return true
             end
           else
