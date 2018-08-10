@@ -71,7 +71,7 @@ module Resque
         ['restriction', restriction_identifier(*args), custom_value, period_str].compact.join(':')
       end
 
-      def restriction_identifier(*args)
+      def restriction_identifier(*_args)
         to_s
       end
 

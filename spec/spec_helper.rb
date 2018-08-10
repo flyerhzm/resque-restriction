@@ -106,7 +106,7 @@ class ConcurrentRestrictionJob
 
   @queue = 'normal'
 
-  def self.perform(*args)
+  def self.perform(*_args)
     sleep 0.2
   end
 end
