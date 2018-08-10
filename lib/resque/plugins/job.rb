@@ -1,7 +1,7 @@
 module Resque
   class Job
     class <<self
-      alias_method :origin_reserve, :reserve
+      alias origin_reserve reserve
 
       def reserve(queue)
         return unless payload = Resque.peek(queue)
