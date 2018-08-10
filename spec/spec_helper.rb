@@ -33,10 +33,10 @@ dir = File.dirname(__FILE__)
 #
 
 at_exit do
-  status_code = if $!.nil? || $!.is_a?(SystemExit) && $!.success?
+  status_code = if $ERROR_INFO.nil? || $ERROR_INFO.is_a?(SystemExit) && $ERROR_INFO.success?
                   0
                 else
-                  $!.is_a?(SystemExit) ? $!.status : 1
+                  $ERROR_INFO.is_a?(SystemExit) ? $ERROR_INFO.status : 1
                 end
 
   pid = `ps -e -o pid,command | grep [r]edis-test`.split(' ')[0]
