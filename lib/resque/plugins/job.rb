@@ -10,10 +10,8 @@ module Resque
         if job_class.is_a?(Resque::Plugins::Restriction)
           return if !job_class.restriction_settings.empty? && job_class.reach_restriction?(*payload['args'])
           job_class.reset_concurrent_restriction(*payload['args'])
-          origin_reserve(queue)
-        else
-          origin_reserve(queue)
         end
+        origin_reserve(queue)
       end
     end
   end
