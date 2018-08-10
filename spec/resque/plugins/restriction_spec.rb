@@ -10,7 +10,7 @@ RSpec.describe Resque::Plugins::Restriction do
       expect(MyJob.redis_key(:per_minute)).to eq "restriction:MyJob:#{Time.now.to_i / 60}"
       expect(MyJob.redis_key(:per_hour)).to eq "restriction:MyJob:#{Time.now.to_i / (60 * 60)}"
       expect(MyJob.redis_key(:per_day)).to eq "restriction:MyJob:#{Time.now.to_i / (24 * 60 * 60)}"
-      expect(MyJob.redis_key(:per_month)).to eq "restriction:MyJob:#{Date.today.strftime("%Y-%m")}"
+      expect(MyJob.redis_key(:per_month)).to eq "restriction:MyJob:#{Date.today.strftime('%Y-%m')}"
       expect(MyJob.redis_key(:per_year)).to eq "restriction:MyJob:#{Date.today.year}"
       expect(MyJob.redis_key(:per_minute_and_foo, 'foo' => 'bar')).to eq "restriction:MyJob:bar:#{Time.now.to_i / 60}"
     end
