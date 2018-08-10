@@ -91,7 +91,7 @@ class IdentifiedRestrictionJob
   @queue = 'normal'
 
   def self.restriction_identifier(*args)
-    [self.to_s, args.first].join(":")
+    [to_s, args.first].join(":")
   end
 
   def self.perform(*args); end
