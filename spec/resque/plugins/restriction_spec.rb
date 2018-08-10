@@ -85,8 +85,7 @@ RSpec.describe Resque::Plugins::Restriction do
       class MyJob
         extend Resque::Plugins::Restriction
 
-        def self.perform(*args)
-        end
+        def self.perform(*args); end
       end
 
       shared_examples_for "expiration" do

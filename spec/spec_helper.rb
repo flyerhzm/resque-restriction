@@ -70,8 +70,7 @@ class OneDayRestrictionJob
 
   @queue = 'normal'
 
-  def self.perform(*args)
-  end
+  def self.perform(*args); end
 end
 
 class OneHourRestrictionJob
@@ -81,8 +80,7 @@ class OneHourRestrictionJob
 
   @queue = 'normal'
 
-  def self.perform(*args)
-  end
+  def self.perform(*args); end
 end
 
 class IdentifiedRestrictionJob
@@ -96,8 +94,7 @@ class IdentifiedRestrictionJob
     [self.to_s, args.first].join(":")
   end
 
-  def self.perform(*args)
-  end
+  def self.perform(*args); end
 end
 
 class ConcurrentRestrictionJob
@@ -119,8 +116,7 @@ class MultipleRestrictionJob
 
   @queue = 'normal'
 
-  def self.perform(*args)
-  end
+  def self.perform(*args); end
 end
 
 class MultiCallRestrictionJob
@@ -131,6 +127,5 @@ class MultiCallRestrictionJob
 
   @queue = 'normal'
 
-  def self.perform(*args)
-  end
+  def self.perform(*args); end
 end
