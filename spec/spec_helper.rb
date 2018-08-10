@@ -5,7 +5,7 @@ require 'resque/restriction'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = ".rspec_status"
+  config.example_status_persistence_file_path = '.rspec_status'
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
@@ -19,9 +19,9 @@ end
 # make sure we can run redis
 #
 
-unless system("which redis-server")
+unless system('which redis-server')
   puts '', "** can't find `redis-server` in your path"
-  puts "** try running `sudo rake install`"
+  puts '** try running `sudo rake install`'
   abort ''
 end
 
@@ -39,13 +39,13 @@ at_exit do
                   $!.is_a?(SystemExit) ? $!.status : 1
                 end
 
-  pid = `ps -e -o pid,command | grep [r]edis-test`.split(" ")[0]
+  pid = `ps -e -o pid,command | grep [r]edis-test`.split(' ')[0]
   puts "Killing test redis server [#{pid}]..."
   `rm -f #{dir}/dump.rdb`
   exit status_code
 end
 
-puts "Starting redis for testing at localhost:9736..."
+puts 'Starting redis for testing at localhost:9736...'
 `redis-server #{dir}/redis-test.conf`
 Resque.redis = 'localhost:9736'
 
@@ -93,7 +93,7 @@ class IdentifiedRestrictionJob
   @queue = 'normal'
 
   def self.restriction_identifier(*args)
-    [to_s, args.first].join(":")
+    [to_s, args.first].join(':')
   end
 
   def self.perform(*args); end

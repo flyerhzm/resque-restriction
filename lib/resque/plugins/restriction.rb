@@ -62,13 +62,13 @@ module Resque
       def redis_key(period, *args)
         period_key, custom_key = period.to_s.split('_and_')
         period_str = case period_key.to_sym
-                     when :concurrent then "*"
+                     when :concurrent then '*'
                      when :per_second, :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
-                     when :per_month then Date.today.strftime("%Y-%m")
+                     when :per_month then Date.today.strftime('%Y-%m')
                      when :per_year then Date.today.year.to_s
                      else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
         custom_value = custom_key && args.first && args.first.is_a?(Hash) ? args.first[custom_key] : nil
-        ['restriction', restriction_identifier(*args), custom_value, period_str].compact.join(":")
+        ['restriction', restriction_identifier(*args), custom_value, period_str].compact.join(':')
       end
 
       def restriction_identifier(*args)

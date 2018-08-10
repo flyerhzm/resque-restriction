@@ -9,7 +9,7 @@ RSpec.describe Resque::Job do
 
   context 'reserve' do
     context 'reach restriction' do
-      it "should do nothing" do
+      it 'should do nothing' do
         Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
         Resque.push('normal', class: 'OneHourRestrictionJob', args: ['any args'])
         expect(Resque::Job.reserve('normal')).to be_nil
@@ -18,7 +18,7 @@ RSpec.describe Resque::Job do
     end
 
     context 'not reach restriction' do
-      it "should pop job" do
+      it 'should pop job' do
         Resque.push('normal', class: 'OneHourRestrictionJob', args: ['any args'])
         expect(Resque::Job.reserve('normal')).to eq Resque::Job.new('normal', 'class' => 'OneHourRestrictionJob', 'args' => ['any args'])
         expect(Resque.pop('normal')).to be_nil
