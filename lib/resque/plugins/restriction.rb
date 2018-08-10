@@ -66,7 +66,7 @@ module Resque
                      when :per_second, :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
                      when :per_month then Date.today.strftime('%Y-%m')
                      when :per_year then Date.today.year.to_s
-                     else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
+                     else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / Regexp.last_match(1).to_i).to_s end
         custom_value = custom_key && args.first && args.first.is_a?(Hash) ? args.first[custom_key] : nil
         ['restriction', restriction_identifier(*args), custom_value, period_str].compact.join(':')
       end
@@ -80,7 +80,7 @@ module Resque
         if SECONDS.key?(period_key.to_sym)
           SECONDS[period_key.to_sym]
         else
-          period_key =~ /^per_(\d+)$/ and $1.to_i
+          period_key =~ /^per_(\d+)$/ and Regexp.last_match(1).to_i
         end
       end
 
