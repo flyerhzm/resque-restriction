@@ -11,7 +11,7 @@ module Resque
         per_week: 7 * 24 * 60 * 60,
         per_month: 31 * 24 * 60 * 60,
         per_year: 366 * 24 * 60 * 60
-      }
+      }.freeze
 
       def restriction_settings
         @options ||= {}
