@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Resque
   class Job
     class <<self
