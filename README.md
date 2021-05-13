@@ -60,6 +60,8 @@ The argument of restrict method is a hash, the key of the hash is a period time,
 Advance
 -------
 
+### Custom Restrictions
+
 You can also add customized restriction as you like. For example, we have a job to restrict the facebook post numbers 40 times per user per day, we can define as:
 
 
@@ -92,6 +94,17 @@ end
 
 options["user_id"] returns the user's facebook uid, the key point is that the different restriction_identifiers can restrict different job execution numbers.
 
+### Reducing Redis Thrashing
+
+With large restriction queues (1,000+ jobs), Redis is hit with a large number of `Resque.pop` and re-enqueue calls which puts the job immediately back into the restriction queue. That process translates to extraneous Redis requests.
+
+To avoid the extraneous Redis calls, configure `max_queue_peek`. An appropriate `max_queue_peek` value depends on your application, number of workers, job processing time, and peek jobs in the queue. By default `max_queue_peek` is disabled.
+
+```ruby
+Resque::Restriction.configure do |config|
+  config.max_queue_peek = 100 # jobs
+end
+```
 
 Contributing
 ------------

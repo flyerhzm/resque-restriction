@@ -59,7 +59,7 @@ RSpec.describe Resque::Plugins::Restriction do
     include PerformJob
 
     before(:example) do
-      Resque.redis.flushall
+      Resque.redis.redis.flushall
     end
 
     it "should set execution number and decrement it when one job first executed" do

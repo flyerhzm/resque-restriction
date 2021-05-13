@@ -7,8 +7,8 @@ module Resque
         if queue =~ /^#{Plugins::Restriction::RESTRICTION_QUEUE_PREFIX}/
           # If processing the restriction queue, when poping and pushing to end,
           # we can't tell when we reach the original one, so just walk the length
-          # of the queue so we don't run infinitely long
-          Resque.size(queue).times do |i|
+          # of the queue or up to max_queue_peek so we don't run infinitely long
+          [Resque.size(queue), Restriction.config.max_queue_peek(queue)].compact.min.times do
             # For the job at the head of the queue, repush to restricition queue
             # if still restricted, otherwise we have a runnable job, so create it
             # and return
@@ -19,7 +19,7 @@ module Resque
               end
             end
           end
-          return nil
+          nil
         else
           # drop through to original Job::Reserve if not restriction queue
           origin_reserve(queue)

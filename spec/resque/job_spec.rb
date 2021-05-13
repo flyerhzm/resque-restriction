@@ -2,7 +2,7 @@ require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 RSpec.describe Resque::Job do
   before(:example) do
-    Resque.redis.flushall
+    Resque.redis.redis.flushall
   end
 
   it "should repush restriction queue when reserve" do
