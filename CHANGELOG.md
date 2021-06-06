@@ -1,5 +1,10 @@
 ### Unreleased
 
+# 0.7.0 (2021-06-06)
+
+* Support `per_second`
+* Reduce Redis thrashing on large restriction queues
+
 # 0.6.0
 
 * support customized period like `per_minute_and_user_id`
