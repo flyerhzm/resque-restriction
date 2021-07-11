@@ -7,7 +7,7 @@ RSpec.describe Resque::Job do
 
   it "should repush restriction queue when reserve" do
     Resque.push('restriction_normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
-    expect(Resque::Job.reserve('restriction_normal')).to eq Resque::Job.new('restriction_normal', {'class' => 'OneHourRestrictionJob', 'args' => ['any args']})
+    expect(Resque::Job.reserve('restriction_normal')).to eq Resque::Job.new('restriction_normal', { 'class' => 'OneHourRestrictionJob', 'args' => ['any args'] })
     expect(Resque::Job.reserve('restriction_normal')).to be_nil
     expect(Resque::Job.reserve('normal')).to be_nil
   end
@@ -16,13 +16,13 @@ RSpec.describe Resque::Job do
     Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
     Resque.push('restriction_normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
     expect(Resque::Job.reserve('restriction_normal')).to be_nil
-    expect(Resque.pop('restriction_normal')).to eq({'class' => 'OneHourRestrictionJob', 'args' => ['any args']})
+    expect(Resque.pop('restriction_normal')).to eq({ 'class' => 'OneHourRestrictionJob', 'args' => ['any args'] })
     expect(Resque::Job.reserve('normal')).to be_nil
   end
 
   it "should not repush when reserve normal queue" do
     Resque.push('normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
-    expect(Resque::Job.reserve('normal')).to eq Resque::Job.new('normal', {'class' => 'OneHourRestrictionJob', 'args' => ['any args']})
+    expect(Resque::Job.reserve('normal')).to eq Resque::Job.new('normal', { 'class' => 'OneHourRestrictionJob', 'args' => ['any args'] })
     expect(Resque::Job.reserve('normal')).to be_nil
     expect(Resque::Job.reserve('restriction_normal')).to be_nil
   end

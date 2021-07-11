@@ -8,8 +8,8 @@ RSpec.describe Resque::Plugins::Restriction do
   context "redis_key" do
     it "should get redis_key with different period" do
       expect(MyJob.redis_key(:per_minute)).to eq "restriction:MyJob:#{Time.now.to_i / 60}"
-      expect(MyJob.redis_key(:per_hour)).to eq "restriction:MyJob:#{Time.now.to_i / (60*60)}"
-      expect(MyJob.redis_key(:per_day)).to eq "restriction:MyJob:#{Time.now.to_i / (24*60*60)}"
+      expect(MyJob.redis_key(:per_hour)).to eq "restriction:MyJob:#{Time.now.to_i / (60 * 60)}"
+      expect(MyJob.redis_key(:per_day)).to eq "restriction:MyJob:#{Time.now.to_i / (24 * 60 * 60)}"
       expect(MyJob.redis_key(:per_month)).to eq "restriction:MyJob:#{Date.today.strftime("%Y-%m")}"
       expect(MyJob.redis_key(:per_year)).to eq "restriction:MyJob:#{Date.today.year}"
       expect(MyJob.redis_key(:per_minute_and_foo, 'foo' => 'bar')).to eq "restriction:MyJob:bar:#{Time.now.to_i / 60}"
@@ -25,11 +25,11 @@ RSpec.describe Resque::Plugins::Restriction do
   context "seconds" do
     it "should get seconds with different period" do
       expect(MyJob.seconds(:per_minute)).to eq 60
-      expect(MyJob.seconds(:per_hour)).to eq 60*60
-      expect(MyJob.seconds(:per_day)).to eq 24*60*60
-      expect(MyJob.seconds(:per_week)).to eq 7*24*60*60
-      expect(MyJob.seconds(:per_month)).to eq 31*24*60*60
-      expect(MyJob.seconds(:per_year)).to eq 366*24*60*60
+      expect(MyJob.seconds(:per_hour)).to eq 60 * 60
+      expect(MyJob.seconds(:per_day)).to eq 24 * 60 * 60
+      expect(MyJob.seconds(:per_week)).to eq 7 * 24 * 60 * 60
+      expect(MyJob.seconds(:per_month)).to eq 31 * 24 * 60 * 60
+      expect(MyJob.seconds(:per_year)).to eq 366 * 24 * 60 * 60
       expect(MyJob.seconds(:per_minute_and_foo)).to eq 60
     end
 
@@ -42,10 +42,10 @@ RSpec.describe Resque::Plugins::Restriction do
 
   context "settings" do
     it "get correct number to restriction jobs" do
-      expect(OneDayRestrictionJob.settings).to eq({:per_day => 100})
-      expect(OneHourRestrictionJob.settings).to eq({:per_hour => 10})
-      expect(MultipleRestrictionJob.settings).to eq({:per_hour => 10, :per_300 => 2})
-      expect(MultiCallRestrictionJob.settings).to eq({:per_hour => 10, :per_300 => 2})
+      expect(OneDayRestrictionJob.settings).to eq({ :per_day => 100 })
+      expect(OneHourRestrictionJob.settings).to eq({ :per_hour => 10 })
+      expect(MultipleRestrictionJob.settings).to eq({ :per_hour => 10, :per_300 => 2 })
+      expect(MultiCallRestrictionJob.settings).to eq({ :per_hour => 10, :per_300 => 2 })
     end
   end
 
