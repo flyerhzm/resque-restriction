@@ -39,7 +39,8 @@ module Resque
             raise ArgumentError
           end
         rescue ArgumentError
-          raise ArgumentError, "max_queue_peek should be either nil or an Integer greater than 0 but #{value.inspect} was provided"
+          raise ArgumentError,
+                "max_queue_peek should be either nil or an Integer greater than 0 but #{value.inspect} was provided"
         end
 
         peek

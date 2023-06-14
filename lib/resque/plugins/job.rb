@@ -1,6 +1,6 @@
 module Resque
   class Job
-    class <<self
+    class << self
       alias_method :origin_reserve, :reserve
 
       def reserve(queue)
@@ -25,7 +25,6 @@ module Resque
           origin_reserve(queue)
         end
       end
-
     end
   end
 end
