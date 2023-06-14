@@ -100,7 +100,7 @@ module Resque
       # restriction conditions have changed
       def repush(*args)
         has_restrictions = false
-        settings.each do |period, number|
+        settings.each do |period, _number|
           key = resque_restriction_redis_key(period, *args)
           value = Resque.redis.get(key)
           has_restrictions = value && value != "" && value.to_i <= 0
