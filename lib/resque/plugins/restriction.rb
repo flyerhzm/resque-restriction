@@ -4,11 +4,11 @@ module Resque
       SECONDS = {
         :per_second => 1,
         :per_minute => 60,
-        :per_hour => 60*60,
-        :per_day => 24*60*60,
-        :per_week => 7*24*60*60,
-        :per_month => 31*24*60*60,
-        :per_year => 366*24*60*60
+        :per_hour => 60 * 60,
+        :per_day => 24 * 60 * 60,
+        :per_week => 7 * 24 * 60 * 60,
+        :per_month => 31 * 24 * 60 * 60,
+        :per_year => 366 * 24 * 60 * 60
       }
       RESTRICTION_QUEUE_PREFIX = 'restriction'
 
@@ -16,7 +16,7 @@ module Resque
         @options ||= {}
       end
 
-      def restrict(options={})
+      def restrict(options = {})
         settings.merge!(options)
       end
 
@@ -30,7 +30,7 @@ module Resque
           # first try to set period key to be the total allowed for the period
           # if we get a 0 result back, the key wasn't set, so we know we are
           # already tracking the count for that period'
-          period_active = ! Resque.redis.setnx(key, number.to_i - 1)
+          period_active = !Resque.redis.setnx(key, number.to_i - 1)
           # If we are already tracking that period, then decrement by one to
           # see if we are allowed to run, pushing to restriction queue to run
           # later if not.  Note that the value stored is the number of outstanding
@@ -42,7 +42,7 @@ module Resque
             if value < 0
               # reincrement the keys if one of the periods triggers DontPerform so
               # that we accurately track capacity
-              keys_decremented.each {|k| Resque.redis.incrby(k, 1) }
+              keys_decremented.each { |k| Resque.redis.incrby(k, 1) }
               Resque.push restriction_queue_name, :class => to_s, :args => args
               raise Resque::Job::DontPerform
             end
@@ -66,12 +66,13 @@ module Resque
 
       def resque_restriction_redis_key(period, *args)
         period_key, custom_key = period.to_s.split('_and_')
-        period_str = case period_key.to_sym
-                     when :concurrent then "*"
-                     when :per_second, :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
-                     when :per_month then Date.today.strftime("%Y-%m")
-                     when :per_year then Date.today.year.to_s
-                     else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
+        period_str =
+          case period_key.to_sym
+          when :concurrent then "*"
+          when :per_second, :per_minute, :per_hour, :per_day, :per_week then (Time.now.to_i / SECONDS[period_key.to_sym]).to_s
+          when :per_month then Date.today.strftime("%Y-%m")
+          when :per_year then Date.today.year.to_s
+          else period_key =~ /^per_(\d+)$/ and (Time.now.to_i / $1.to_i).to_s end
         custom_value = (custom_key && args.first && args.first.is_a?(Hash)) ? args.first[custom_key] : nil
         [RESTRICTION_QUEUE_PREFIX, self.restriction_identifier(*args), custom_value, period_str].compact.join(":")
       end
