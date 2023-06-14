@@ -13,7 +13,7 @@ RSpec.describe Resque::Job do
   end
 
   it "should push back to restriction queue when still restricted" do
-    Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
+    Resque.redis.set(OneHourRestrictionJob.resque_restriction_redis_key(:per_hour), -1)
     Resque.push('restriction_normal', :class => 'OneHourRestrictionJob', :args => ['any args'])
     expect(Resque::Job.reserve('restriction_normal')).to be_nil
     expect(Resque.pop('restriction_normal')).to eq({'class' => 'OneHourRestrictionJob', 'args' => ['any args']})
@@ -28,7 +28,7 @@ RSpec.describe Resque::Job do
   end
 
   it "should only push back queue_length times to restriction queue" do
-    Resque.redis.set(OneHourRestrictionJob.redis_key(:per_hour), -1)
+    Resque.redis.set(OneHourRestrictionJob.resque_restriction_redis_key(:per_hour), -1)
     3.times { Resque.push('restriction_normal', :class => 'OneHourRestrictionJob', :args => ['any args']) }
     expect(Resque.size('restriction_normal')).to eq 3
     expect(OneHourRestrictionJob).to receive(:repush).exactly(3).times.and_return(true)

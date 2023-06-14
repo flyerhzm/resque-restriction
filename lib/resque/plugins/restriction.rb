@@ -25,7 +25,7 @@ module Resque
 
         keys_decremented = []
         settings.each do |period, number|
-          key = redis_key(period, *args)
+          key = resque_restriction_redis_key(period, *args)
 
           # first try to set period key to be the total allowed for the period
           # if we get a 0 result back, the key wasn't set, so we know we are
@@ -55,7 +55,7 @@ module Resque
 
       def after_perform_restriction(*args)
         if settings[:concurrent]
-          key = redis_key(:concurrent, *args)
+          key = resque_restriction_redis_key(:concurrent, *args)
           Resque.redis.incrby(key, 1)
         end
       end
@@ -64,7 +64,7 @@ module Resque
         after_perform_restriction(*args)
       end
 
-      def redis_key(period, *args)
+      def resque_restriction_redis_key(period, *args)
         period_key, custom_key = period.to_s.split('_and_')
         period_str = case period_key.to_sym
                      when :concurrent then "*"
@@ -101,7 +101,7 @@ module Resque
       def repush(*args)
         has_restrictions = false
         settings.each do |period, number|
-          key = redis_key(period, *args)
+          key = resque_restriction_redis_key(period, *args)
           value = Resque.redis.get(key)
           has_restrictions = value && value != "" && value.to_i <= 0
           break if has_restrictions
