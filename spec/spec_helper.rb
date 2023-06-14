@@ -31,7 +31,7 @@ dir = File.dirname(__FILE__)
 #
 
 at_exit do
-  status_code = if $!.nil? || $!.is_a?(SystemExit) && $!.success?
+  status_code = if $!.nil? || ($!.is_a?(SystemExit) && $!.success?)
                   0
                 else
                   $!.is_a?(SystemExit) ? $!.status : 1
