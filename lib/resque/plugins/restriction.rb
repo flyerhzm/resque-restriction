@@ -60,7 +60,7 @@ module Resque
         end
       end
 
-      def on_failure_restriction(ex, *args)
+      def on_failure_restriction(_ex, *args)
         after_perform_restriction(*args)
       end
 
@@ -76,7 +76,7 @@ module Resque
         [RESTRICTION_QUEUE_PREFIX, self.restriction_identifier(*args), custom_value, period_str].compact.join(":")
       end
 
-      def restriction_identifier(*args)
+      def restriction_identifier(*_args)
         self.to_s
       end
 
